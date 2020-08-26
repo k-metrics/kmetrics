@@ -1,6 +1,6 @@
-\name{R Basics}
-\alias{R Basics}
-\title{基本文法編}
+\name{ggplot2 Basics}
+\alias{ggplot2 Basics}
+\title{ggplot2のすゝめ（準備中）}
 \usage{
 click "Start Tutorial" in "Tutorial" pane.
 }

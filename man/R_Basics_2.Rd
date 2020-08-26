@@ -1,6 +1,6 @@
-\name{R Basics}
-\alias{R Basics}
-\title{基本文法編}
+\name{R Basics, part2}
+\alias{R Basics, part2}
+\title{要約統計量・グラフ・検定編}
 \usage{
 click "Start Tutorial" in "Tutorial" pane.
 }

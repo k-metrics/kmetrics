@@ -1,6 +1,6 @@
-\name{R Basics}
-\alias{R Basics}
-\title{基本文法編}
+\name{tidyverse Basics}
+\alias{tidyverse Basics}
+\title{dplyrのすゝめ（準備中）}
 \usage{
 click "Start Tutorial" in "Tutorial" pane.
 }

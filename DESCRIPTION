@@ -1,16 +1,16 @@
 Package: kmetrics
 Type: Package
-Title: in-IDE japanese tutorial for R beginers
+Title: in-IDE japanese tutorial for beginners
 Version: 0.1.2
 Author: Sampo Suzuki
 Maintainer: The package maintainer <k-metrics@github.com>
-Description: R basics tutorial in japanese.
-    This package contains tutorial ONLY.
+Description: in-IDE tutorials in japanese.
+    This package contains tutorials ONLY.
 Depends: R (>= 3.6.0)
 Imports: learnr, shiny, tidyverse
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, htmltools
 URL: https://github.com/k-metrics/kmetrics
-License: MIT + file License
+License: MIT License
 Encoding: UTF-8
 LazyData: true
 Language: ja-JP
