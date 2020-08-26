@@ -1,5 +1,5 @@
 ---
-title: "R Basics (Japanese Tutorial)"
+title: "R Basics"
 output:
   learnr::tutorial:
     df_print: "paged"
@@ -7,7 +7,7 @@ output:
     md_extensions: -ascii_identifiers
 runtime: shiny_prerendered
 description: > 
-  データ分析勉強会で使用した『RStudioのすゝめ』を再編成しチュートリアル化したものです。
+  **Japanese** Tutorial, データ分析勉強会の初学者向け講義『RStudioのすゝめ』の資料を再整理し対話型チュートリアル形式にしました。
 ---
 
 <!-- 必要なパッケージ
@@ -28,7 +28,6 @@ knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
 
 require(learnr)
 require(tidyverse)
-tidyverse::tidyverse_conflicts()
 ```
 
 ## はじめに
