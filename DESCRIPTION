@@ -1,0 +1,15 @@
+Package: kmetrics
+Type: Package
+Title: learnr tutorial files for R beginers
+Version: 0.1.0
+Author: Sampo Suzuki
+Maintainer: The package maintainer <k-metrics@github.com>
+Description: R basics Japanese tutorial
+    This package contains tutorial files ONLY.
+Depends: R (>= 3.6.0)
+Imports: learnr (>= 0.10.0), shiny, tidyverse
+Suggests: knitr, rmarkdown
+License: MIT + file License
+Encoding: UTF-8
+LazyData: true
+Language: ja-JP
