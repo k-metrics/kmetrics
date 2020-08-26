@@ -41,7 +41,7 @@ devtools::install_github("k-metrics/kmetrics")
 　  
 
 ## Tutorials
-　`kmetrics` パッケージが提供するチュートリアルファイルについてはヘルプでご確認ください。  
+　`kmetrics` パッケージが提供するチュートリアルファイルについてはヘルプでご確認ください。なお、チュートリアルの内容は予告なく変更します。  
 
 　  
 
