@@ -1,0 +1,212 @@
+---
+title: "Time Serise"
+output:
+  learnr::tutorial:
+    df_print: "paged"
+    highlight: textmate
+    md_extensions: -ascii_identifiers
+runtime: shiny_prerendered
+description: > 
+  **Japanese** Tutorial, Base R で扱える時系列データ分析の基本に関するチュートリアルです。
+---
+
+<!-- 必要なパッケージ
+本チュートリアルファイルを実行するためには以下のパッケージが必要です。必ず
+インストールされていることを確認して下さい。
+
+knitr, learnr, rmarkdown, shiny, tidyverse
+
+インストールされていない場合、以下のページを参考にパッケージをインストール
+してください。
+
+https://k-metrics.github.io/cabinet/program/env/install_chk.html
+-->
+
+```{r setup, include=FALSE}
+# 共通chunkオプションの指定
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+require(learnr)
+require(tidyverse)
+require(magrittr)
+```
+
+## はじめに
+時系列データ分析は [CRAN](https://cran.r-project.org/) のタスク [Time Series Analysis](https://cran.r-project.org/web/views/TimeSeries.html) として取り上げられている分析です。  
+時系列データ分析の基本となっているのがデータフレーム変数などと同様に `stats` パッケージで定義されている時系列オブジェクト（Time-Series Objects）[`ts`](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/ts.html) です。  
+　  
+本チュートリアルでは時系列データ分析の最も基本となる `ts` オブジェクトの扱い方について学んでいきます。  
+
+
+## 時系列型
+
+### 時系列型とは
+Base R には 1960〜1968 年の英国におけるガスの消費量を四半期ごとまとめた `datasets::UKgas` という下記のようなサンプルデータがあります。  
+```{r}
+UKgas
+```
+　  
+一見、行名付きデータフレーム・オブジェクトのように見えますが、`UKgas` は何クラスのオブジェクト（何型）か確認してください。  
+```{r ts-class, exercise=TRUE}
+
+```
+
+```{r ts-class-solution, exercise.lines=1}
+class(UKgas)
+```
+　  
+　次に `UKgas` の構造を確認してください。  
+```{r ts-str, exercise=TRUE}
+
+```
+
+```{r ts-str-solution, exercise.lines=1}
+str(UKgas)
+```
+
+
+## 時系列型の特徴
+時系列型は一見、データフレーム型のように見えますが、実体は時間軸の情報(因子型のようなインデックス)を持った特殊なベクトル型です。なので、`ts`オブジェクトをプロットすると下図のように横軸に時間軸、縦軸に観測値という時系列ではおなじみの折線グラフを簡単に描くことができます。  
+```{r}
+plot(UKgas)
+```
+
+　  
+また、時間軸の情報を持っていますので、任意の時間軸でデータを切り出すことが可能です。例えば 1970 年代のデータのみを取り出して可視化することも可能です。`magrittr` のteeパイプを使うと以下のように切り出し結果とプロットを同時に表示させることも可能です。  
+```{r}
+window(UKgas, start = c(1970, 1), end = c(1979, 4)) %T>% 
+  plot()
+```
+
+　  
+
+## 時系列データ分析
+時系列型を使うと何ができるかを見てみます。前出のグラフだけでは、年々、消費量が増えているように見えますが、その傾向は事実なのか否かを簡単に確認することができます。  
+```{r}
+UKgas %>% 
+  decompose() %>% 
+  plot()
+```
+
+　  
+
+グラフ   | グラフ（日本語） | グラフが表していること
+---------|------------------|--------------------------------
+observed | 観測値           | 元データのプロット
+trend    | トレンド（傾向） | 全体の傾向
+seasonal | 季節変動         | 時間の経過で起きる周期的な変動い
+random   | 不規則変動       | 時間の経過に左右されない変動
+
+　  
+全体的に上昇傾向にあることが読み取れます。さらに将来の消費量を予測することもできます。モデル評価などは省略しますが `forecast` パッケージを使うこと簡単に計算できます。
+```{r}
+forecast::auto.arima(UKgas) %>% 
+  forecast::forecast() %>% 
+  plot()
+```
+
+　  
+
+## 時系列型の作り方
+このように傾向分析や予測に便利な時系列を扱うために時系列型（`ts`クラス）をどのように作ればよいのかを見ていきます。  
+　  
+`ts` オブジェクトを作るには `ts` 関数を用います。基本的な指定方法は以下のようになります。  
+```{r, eval=FALSE}
+ts(data = NA, start = 1, end = numeric(), frequency = 1)
+```
+
+　  
+`data` : ベクトル型またはマトリクス型の時系列データ（省略時はNAフィル）
+`start` : 時系列の最初の単位時間（省略時は $1$ から）
+`end` : 時系列の最後の単位時間（省略可）
+`frequency` : 単位時間あたりの観測数（省略時は $1$）
+
+　  
+
+### 年次
+年次の時系列データを作成するには、開始年と終了年を指定するだけです。`frequency` のデフォルト値は $1$ なので省略可能です。また、`data` 引数を省略した場合、デフォルトで `NA` が入ります。
+```{r}
+ts(start = 2020, end = 2025, frequency = 1) %>% 
+  print(calendar = TRUE)    # calling stats:::print.ts() for ts objects print
+```
+
+　  
+
+### 四半期次
+四半期次の時系列データを作成するには `frequency = 4` を指定すると共に `start` と `end` には二変数のベクトル型データを指定します。この指定方法に違和感を覚えるかも知れませんが仕様です。  
+```{r}
+ts(start = c(2020, 1), end = c(2020, 4), frequency = 4)
+```
+　  
+
+#### 【問題】
+2018 年第二四半期から三ヶ年分のデータ `x` を時系列型にしなさい。
+```{r, echo=FALSE}
+x <- (rf(12, df1 = 10, df2 = 100) * 100) %>% round()
+```
+```{r}
+x
+```
+
+　  
+
+```{r ts-quarter, exercise=TRUE}
+
+```
+
+```{r ts-quarter-solution, exercise.lines=1}
+ts(x, start = c(2018, 2), frequency = 4)
+```
+
+　  
+
+### 月次
+月次の時系列データを作成する場合の考え方は四半期次の場合と同様に `frequency` と `start`, `end` を指定します。  
+
+　  
+
+#### 【問題】
+2020 年単年の月次データを作成しなさい。各月のデータは `NA` とします。
+```{r ts-month, exercise=TRUE}
+
+```
+
+```{r ts-month-solution, exercise.lines=1}
+ts(start = c(2020, 1), end = c(2020, 12), frequency = 12)
+```
+
+　  
+
+
+
+
+## Appendix
+更に詳しくRを学ぶには以下の図書やコミュニティを活用してください。
+
+統計の基礎とRで処理方法を学びたい場合は[改定版 統計学基礎][B1]や[Rで楽しむ統計][B2]。
+Rの基礎から学びたい場合は[みんなのR][B3]や[パーフェクトR][B4]。  
+
+ネットコミュニティで質問したい場合は、日本のR界の著名人が集まっている[R-wakalang][C1]や
+[Rjp Wiki][C2]で、検索にはRに特化した検索エンジンである[seek R][C3]がすゝめです。
+
+---
+
+![Sampo Suzuki][CCI]
+[CC BY-NC-SA 4.0][CC], Sampo Suzuki [`r format(Sys.time(), format = '%F %H:%M(%Z)')`]
+
+[0]: https://sites.google.com/site/kantometrics/ "データ分析勉強会"
+[CC]: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja "CC BY-NC-SA 4.0"
+[CCI]: https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "CC BY-NC-SA 4.0 icon"
+[RS]: https://www.rstudio.com/ "RStudio"
+
+<!-- Books -->
+[B1]: http://www.tokyo-tosho.co.jp/books/978-4-489-02227-2/ "統計学基礎"
+[B2]: http://www.kyoritsu-pub.co.jp/bookdetail/9784320112414 "Rで楽しむ統計"
+[B3]: https://book.mynavi.jp/ec/products/detail/id=39763 "みんなのR"
+[B4]: http://gihyo.jp/book/2017/978-4-7741-8812-6 "パーフェクトR"
+
+<!-- Net Community -->
+[C1]: http://qiita.com/uri/items/5583e91bb5301ed5a4ba "R-wakalang"
+[C2]: http://www.okadajp.org/RWiki/ "RjpWiki"
+[C3]: http://seekr.jp/ "seek R"
