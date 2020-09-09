@@ -1,7 +1,7 @@
 in-IDE tutorials in Japanese
 ================
 
-　`kmetrics` パッケージは、[RStudio IDE
+`kmetrics` パッケージは、[RStudio IDE
 v1.3](https://blog.rstudio.com/2020/05/27/rstudio-1-3-release/) の
 [チュートリアル機能（in-IDE
 tutorial）](https://blog.rstudio.com/2020/02/25/rstudio-1-3-integrated-tutorials/)
@@ -11,7 +11,7 @@ tutorial）](https://blog.rstudio.com/2020/02/25/rstudio-1-3-integrated-tutorial
 
 ## Requirement
 
-　`kmetrics` パッケージを利用するには以下の環境が必要です。
+`kmetrics` パッケージを利用するには以下の環境が必要です。
 
 | Env.     | Requirement                                | Memo              |
 | -------- | ------------------------------------------ | ----------------- |
@@ -23,7 +23,7 @@ tutorial）](https://blog.rstudio.com/2020/02/25/rstudio-1-3-integrated-tutorial
 
 ## Install
 
-　パッケージは [GitHub repository](https://github.com/k-metrics/kmetrics)
+パッケージは [GitHub repository](https://github.com/k-metrics/kmetrics)
 からインストールしてください。
 
 ``` r
@@ -31,7 +31,7 @@ install.packages("devtools")
 devtools::install_github("k-metrics/kmetrics")
 ```
 
-　インストールが終わりましたら R
+インストールが終わりましたら R
 のセッションをリスタートさせてください。チュートリアルタブにチュートリアルファイルが表示されます。チュートリアルファイルが表示されない場合は、RStudio
 を再起動してみてください。
 
@@ -39,7 +39,7 @@ devtools::install_github("k-metrics/kmetrics")
 
 ## Usage
 
-　RStudio IDE (Desktop or Server) の “Tutorial” タブに表示されているチュートリアルを選び［Start
+RStudio IDE (Desktop or Server) の “Tutorial” タブに表示されているチュートリアルを選び［Start
 Tutorial］ボタンをクリックするとレンダリング処理後にチュートリアルが表示されます。対話形式のチュートリアルになっていますので、設問などに解答する形式で学習をすゝめられます。  
 　チュートリアルを終了する場合は “Tutorial” タブのツールバーに表示されている赤色の［Stop
 tutorial］ボダンをクリックしてください。
@@ -48,7 +48,7 @@ tutorial］ボダンをクリックしてください。
 
 ## Tutorials
 
-　`kmetrics`
+`kmetrics`
 パッケージが提供するチュートリアルファイルについてはヘルプでご確認ください。なお、チュートリアルの内容は予告なく変更します。
 
 　

@@ -5,9 +5,10 @@ output:
     df_print: "paged"
     highlight: textmate
     md_extensions: -ascii_identifiers
+    # theme: lumen
 runtime: shiny_prerendered
 description: > 
-  **Japanese** Tutorial, Base R で扱える時系列データ分析の基本に関するチュートリアルです。
+  **Japanese** Tutorial, Base R で扱える時系列データ分析に入門するためのさわりのチュートリアルです。
 ---
 
 <!-- 必要なパッケージ
@@ -30,14 +31,13 @@ htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 require(learnr)
 require(tidyverse)
 require(magrittr)
+require(forecast)
 ```
 
 ## はじめに
-時系列データ分析は [CRAN](https://cran.r-project.org/) のタスク [Time Series Analysis](https://cran.r-project.org/web/views/TimeSeries.html) として取り上げられている分析です。  
-時系列データ分析の基本となっているのがデータフレーム変数などと同様に `stats` パッケージで定義されている時系列オブジェクト（Time-Series Objects）[`ts`](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/ts.html) です。  
-　  
-本チュートリアルでは時系列データ分析の最も基本となる `ts` オブジェクトの扱い方について学んでいきます。  
+時系列データ分析は [CRAN](https://cran.r-project.org/) において [Time Series Analysis](https://cran.r-project.org/web/views/TimeSeries.html) タスクとして開発対象になっている分析分野です。R において時系列データ分析の基本となるのが `stats` パッケージで定義されている時系列型（Time-Series Class）[`ts`](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/ts.html) のオブジェクトです。他のオブジェクト（変数）に比べると分かりにくいと思われますので、本チュートリアルでは時系列型の特徴とメリット、基本的な時系列型データの作成方法を学びます。    
 
+　  
 
 ## 時系列型
 
@@ -178,9 +178,6 @@ ts(start = c(2020, 1), end = c(2020, 12), frequency = 12)
 
 　  
 
-
-
-
 ## Appendix
 更に詳しくRを学ぶには以下の図書やコミュニティを活用してください。
 
@@ -190,10 +187,12 @@ Rの基礎から学びたい場合は[みんなのR][B3]や[パーフェクトR]
 ネットコミュニティで質問したい場合は、日本のR界の著名人が集まっている[R-wakalang][C1]や
 [Rjp Wiki][C2]で、検索にはRに特化した検索エンジンである[seek R][C3]がすゝめです。
 
+　  
+
 ---
 
 ![Sampo Suzuki][CCI]
-[CC BY-NC-SA 4.0][CC], Sampo Suzuki [`r format(Sys.time(), format = '%F %H:%M(%Z)')`]
+[CC BY-NC-SA 4.0][CC], Sampo Suzuki [`r format(Sys.time(), format = '%F (%Z)')`]
 
 [0]: https://sites.google.com/site/kantometrics/ "データ分析勉強会"
 [CC]: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja "CC BY-NC-SA 4.0"
