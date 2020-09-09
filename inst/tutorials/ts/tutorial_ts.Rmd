@@ -8,7 +8,7 @@ output:
     # theme: lumen
 runtime: shiny_prerendered
 description: > 
-  **Japanese** Tutorial, Base R で扱える時系列データ分析に入門するためのさわりのチュートリアルです。
+  **Japanese** Tutorial, 時系列データ分析への第一歩となるチュートリアルです。
 ---
 
 <!-- 必要なパッケージ
