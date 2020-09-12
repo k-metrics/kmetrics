@@ -1,0 +1,813 @@
+---
+title: "R Basics, zero"
+output:
+  learnr::tutorial:
+    df_print: "paged"
+    highlight: textmate
+    md_extensions: -ascii_identifiers
+runtime: shiny_prerendered
+description: > 
+  **Japanese** Tutorial, 2018年度データ分析勉強会特別回で用いた資料を再整理し対話型チュートリアル形式にしました。
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = TRUE)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+require(learnr)
+require(tidyverse)
+
+if (getRversion() >= "3.6.0") {
+  RNGversion("3.5.3")     # R >= 3.6.0の場合のみ（前方互換性確保のため）
+}
+```
+
+## はじめに
+本チュートリアルは、2018年度データ分析勉強会特別回で用いた資料をチュートリアル形式にまとめなおしたものです。とにかくやってみようというスタンスで手を動かしてコードを書くことを前提に構成しています。  
+なお、本チュートリアルは『Base R Cheetsheet』（ [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)）のコードの一部を参考にしています。  
+
+　  
+
+### チュートリアルの使い方 {.tabset}
+各演習では以下のようなチュートリアルエリアが表示されます。解答コードを記述し`［Run Code］`ボタンをクリックすると実行結果が表示されると共に実行したことが記録されます。解答が分からない場合は`［Hint］`ボタンをクリックするとヒントが表示されます。ヒントに記載されているコードをコピーするには`［Copy to Clipboard］`ボタンをクリックしてください。解答をやり直す場合には`［Satrt Over］`ボタンをクリックしてから解答を記述し再実行します。  
+左側のメニュー最下部にある`［Start Over］`をクリックすると全ての学習記録がクリアされます。
+
+#### 設問
+`iris`データセットを表示してください。演習を実行したら［解説］タブをクリックします。
+```{r tutorial-example, exercise=TRUE, exercise.cap="演習タイトル"}
+# Write R code here
+```
+
+```{r tutorial-example-hint, exercise=FALSE}
+# Hint
+iris
+```
+---
+
+#### 解説
+解説がある場合は、このようなタブ形式で表示します。タブが表示されていない演習には解説がありません。
+```{r}
+head(iris)
+```
+
+
+---
+
+では、［Next Topic］ボタンをクリックしてチュートリアルを始めましょう。
+
+
+
+## Rの特徴
+Rの一番の特徴とも言えるのはベクトル演算（ベクトル処理）が可能な点です。ベクトル演算はRの基本です。  
+
+
+### 【演習】加算 {.tabset}
+
+#### 設問
+まず、ベクトル同士の加算を実行してください。  
+```{r basic-operation-plus, exercise=TRUE}
+c(1, 2, 3, 4, 5) + c(1, 2, 1, 2, 1)
+```
+---
+
+#### 解説
+ベクトル演算は基本的に等長であることが条件です。不等長のベクトルに対して演算を行うとベクトル長が短い側の値を先頭から再利用してベクトル長を合わせます。例えば、
+```{r}
+c(1, 2, 3, 4, 5) + c(1, 2, 1)
+```
+は先頭から二つ（`1, 2`）を再利用しますので、以下と同様の結果になります。
+```{r}
+c(1, 2, 3, 4, 5) + c(1, 2, 1, 1, 2)
+```
+---
+
+
+### 【演習】乗算 
+Rのベクトル演算はループ処理を必要としませんので、非常に簡単かつ高速に処理することが可能です。では、乗算を実行してください。
+```{r basic-operation-multi, exercise=TRUE}
+c(1, 2, 3, 4, 5) * c(1, 2, 1, 2, 1)
+```
+---
+
+
+### 【演習】減算
+次に上記の加算と乗算で利用したベクトルの値を使って除算を実行してください。 
+```{r basic-operation-minus, exercise=TRUE}
+
+```
+
+```{r basic-operation-minus-hint, exercise=FALSE}
+c(1, 2, 3, 4, 5) - c(1, 2, 1, 2, 1)
+```
+---
+
+### 【演習】除算
+同様に除算を実行してください。
+```{r basic-operation-div, exercise=TRUE}
+
+```
+
+```{r basic-operation-div-hint, exercise=FALSE}
+c(1, 2, 3, 4, 5) / c(1, 2, 1, 2, 1)
+```
+---
+
+
+
+## 変数の作成
+
+### 【演習】変数の作成 {.tabset}
+前出の`c`関数はベクトルを作成する関数です。`c`関数の結果を任意の変数名に代入することで変数が作成できます。
+
+#### 設問
+コードを実行して変数`a`と変数`b`を作成してください。  
+```{r variable-basics-ab, exercise=TRUE}
+a <- c(1, 2, 3, 4, 5)
+b <- c(1, 2, 1, 2, 1)
+```
+---
+
+#### 解説
+Rでは代入演算子に`<-`を用います。`=`を用いることも可能ですが推奨されていません。
+```{r}
+a <- c(1, 2, 3, 4, 5)
+b = c(1, 2, 1, 2, 1)
+```
+---
+
+```{r　variable-basics-create}
+a <- c(1, 2, 3, 4, 5)
+b <- c(1, 2, 1, 2, 1)
+```
+
+
+### 【演習】変数の参照
+代入で変数の作成は行われますが、代入結果として変数（の値）の参照は行われません。変数を参照するには変数名のみを記述して実行します。作成した変数`a`と`b`を参照するコードを記述して実行してください。  
+```{r variable-basics-ref, exercise=TRUE, exercise.setup="variable-basics-create"}
+
+```
+
+```{r variable-basics-ref-hint, exercise=FALSE}
+a
+b
+```
+
+
+
+## 変数の参照
+前トピックでは変数全体を参照する方法を学びました。本トピックでは以下の変数`x`を用いて変数を部分的に参照する方法を学びます。
+```{r}
+x <- c(1:10)
+x
+```
+
+```{r variable-ref-x, echo=FALSE}
+x <- c(1:10)
+```
+
+
+### 【演習】基本的な参照 {.tabset}
+変数`x`の$n$番目の値を参照するには参照演算子（`[]`, Extract Operator）を用いて`x[n]`とインデックス（`n`）で指定します。
+
+#### 設問
+変数`x`の4番目の値を参照してください。  
+```{r variable-ref-by-position, exercise=TRUE, exercise.setup="variable-ref-x"}
+x[4]
+```
+---
+
+#### 解説
+ベクトル内の位置を示すインデックスは$1$から始まります。ベクトル型を参照した際に左側に表示される`[1]`や`[26]`という数字は最初に表示されている値のインデックスの値です。
+```{r}
+c(1:50)
+```
+---
+
+
+### 【演習】マイナスを用いた参照 {.tabset}
+では、参照する番号に`-`演算子を指定するとどのようになるでしょうか？  
+
+#### 設問
+以下のコードを実行して確認してください。
+```{r variable-ref-by-minus-position, exercise=TRUE, exercise.setup="variable-ref-x"}
+x[-4]
+```
+---
+
+#### 解説
+Rではインデックスにマイナスの値を指定するとそのインデックスが示す値を取り除きます。他言語ではあまりみられない特徴です。
+```{r}
+x[-1]
+x[-10]
+```
+---
+
+
+### 【演習】範囲指定による参照
+連続した任意の範囲の値をするには`:`演算子を用います。`:`演算子は整数の等差数列を作成する演算子です。以下を実行して確認してください。  
+```{r variable-ref-by-range, exercise=TRUE, exercise.cap="範囲参照", exercise.setup="variable-ref-x"}
+x[2:4]
+```
+
+　  
+
+### 【演習】
+`:`演算子にマイナスを指定するとどうなるか以下を実行して確認してください。  
+```{r variable-ref-by-minus-range, exercise=TRUE, exercise.cap="マイナス範囲参照", exercise.setup="variable-ref-x"}
+x[-(2:4)]
+```
+
+　  
+
+### 【演習】
+変数`x`の1番目と5番目の値を参照するコードを記述・実行してください。  
+```{r variable-ref-exec-1, exercise=TRUE, exercise.cap="任意の箇所の参照", exercise.setup="variable-ref-x"}
+
+```
+
+```{r variable-ref-exec-1-solution, exercise=FALSE}
+x[c(1, 5)]
+```
+
+　  
+
+### 【演習】
+変数`x`の値が5未満のものを参照するコードを記述・実行してください。  
+```{r variable-ref-exec-2, exercise=TRUE, exercise.cap="任意の箇所の参照", exercise.setup="variable-ref-x"}
+
+```
+
+```{r variable-ref-exec-2-solution, exercise=FALSE}
+x[x < 5]
+```
+
+　  
+
+## マトリクス型
+ベクトル型変数の拡張型とも言える変数にマトリクス型（行列型）変数があります。ソフトウェアメトリクス分析ではマトリクス型変数自体を扱うことはほぼないと思われますが、Rの様々な関数がマトリクス型を引数や返り値で使っていますので、基本的なところだけ憶えてください。  
+以下のベクトル型変数`m`を用いてマトリクス型変数について学びます。  
+```{r}
+x <- c(1:9)
+x
+```
+
+```{r matrix-ref-x, echo=FALSE}
+x <- c(1:9)
+```
+
+　  
+
+### 【演習】 {.tabset}
+マトリクス型変数を作成するには`matrix`関数を用いて、ベクトル型データをマトリクス型に変換します。  
+
+#### 設問
+以下のコードを実行してベクトル型変数`x`を3行3列のマトリクス型変数にしてください。  
+```{r matrix-m, exercise=TRUE, exercise.cap="マトリクス型変数の作成", exercise.setup="matrix-ref-x"}
+m <- matrix(x, nrow = 3, ncol = 3)
+m
+```
+
+```{r matrix-ref-m, echo=FALSE}
+m <- matrix(x, nrow = 3, ncol = 3)
+```
+---
+
+#### 解説
+`matrix`関数はデフォルトで列方法から値を割り当てます。
+```{r}
+matrix(x, nrow = 3, ncol = 3)
+```
+行方向で指定したい場合は`byrow`オプションを`TRUE`に指定してください。
+```{r}
+matrix(x, nrow = 3, ncol = 3, byrow = TRUE)
+```
+---
+
+
+
+### 【演習】不一致指定{.tabset}
+元データのベクトル長より大きい要素数（行数$\times$列数 $\gt$ ベクトル長）や小さい要素数（行数$\times$列数 $\lt$ ベクトル長）を指定するどどうなるでしょう？
+
+#### 設問
+以下のコードを実行して確認してください。
+```{r matrix-over, exercise=TRUE, exercise.setup="matrix-ref-x"}
+matrix(x, nrow = 3, ncol = 5)
+matrix(x, nrow = 2, ncol = 2)
+```
+---
+
+#### 解説
+Rではマトリクス型変数に限らずベクトル長より大きな要素を指定した場合は不足分を元データの先頭から要素数になるまで再利用します。エラーにはなりません。  
+```{r}
+matrix(x, nrow = 3, ncol = 5)
+```
+逆に少ない場合には指定要素数までを使います。  
+```{r}
+matrix(x, nrow = 2, ncol = 2)
+```
+---
+
+
+
+### 【演習】二次元参照 {.tabset}
+マトリクス型変数の値を参照する場合も`[]`オペレータを用います。ベクトル変数と異なり二次元で指定することで参照が可能です。
+
+#### 設問
+行を参照してください。
+```{r matrix-ref-by-row, exercise=TRUE, exercise.cap="行参照", exercise.setup="matrix-ref-m"}
+m[2, ]
+```
+列を参照してください。
+```{r matrix-ref-by-col, exercise=TRUE, exercise.cap="行参照", exercise.setup="matrix-ref-m"}
+m[, 3]
+```
+行例で指定して参照してください。
+```{r matrix-ref-by-pos, exercise=TRUE, exercise.cap="行参照", exercise.setup="matrix-ref-m"}
+m[2, 3]
+```
+---
+
+#### 解説
+マトリクス型を表示した際に表示される`[row,]`と`[,col]`が位置を表しています。参照する場合はこの表記を使ってください。
+```{r}
+matrix(x, nrow = 3, ncol = 3)
+```
+---
+
+
+
+### 【演習】一次元参照 {.tabset}
+#### 演習
+マトリクス型を参照する場合は二次元参照（`m[2, 3]`）が基本ですがベクトル型と同様に一次元参照（`m[n]`）も可能です。2行3列のデータを一次元参照してください。
+```{r matrix-ref-by-serise, exercise=TRUE, exercise.setup="matrix-ref-m"}
+
+```
+
+```{r matrix-ref-by-serise-hint, exercise=FALSE}
+m[8]
+```
+---
+
+#### 解説
+```{r, include=FALSE}
+m <- matrix(x, nrow = 3, ncol = 3)
+```
+2行3列目は先頭から8番目の要素です。
+```{r}
+m
+```
+ベクトル型はベクトル型の一種ですのでベクトル型と同様の参照が可能です。
+```{r}
+str(m)
+```
+---
+
+
+
+## リスト型
+リスト型は関数の返り値で使われることが多い型ですので、参照方法を憶えてください。
+自由度の高い変数にリスト型変数があります。リスト型変数は長さが異なり、かつ、異なったデータ型のベクトル変数を複数格納することができるので、様々な関数の返り値に使われます。リスト型変数を作成するには`list`関数を用いて以下のように指定します。
+
+```{r}
+l <- list(x = 1:5, y = c("a", "b")) 
+```
+
+リスト型変数の構造は以下のようになっており、長さの異なる複数のベクトル変数を格納しているのが分かります。
+
+```{r}
+str(l)
+```
+
+では、リスト型変数の値はどのように参照すればよいのでしょうか？ベクトル変数、マトリクス型変数と同様に`[]`オペレータを使って参照することが出来ます。
+
+```{r}
+l[2]
+```
+
+```{r}
+l[[2]]
+```
+
+
+### 【演習】
+上記の二つの参照方法は何が異なっているでしょうか？以下のチャンクに差を確認するためのコードを記述、実行して確認してみてください。
+
+```{r}
+
+```
+
+　  
+
+リスト型変数では`[]`オペレータを用いた位置指定による参照以外に`$`オペレータ（Exract Operator）を用いた名前による参照も可能です。
+
+```{r}
+l$y
+```
+
+参考までに`[]`オペレータを用いて名前による参照を行うことも可能です。
+
+```{r}
+l["y"]
+```
+
+このようにリスト型変数を参照するは複数の参照方法があるので、目的に応じて適切な参照方法を選択してください。
+
+　  
+
+## Data Frames operation
+最も使われる変数は、テキストにあるようにデータフレーム型変数（単にデータフレームと呼ばれることの方が多い）。データフレームとリスト型変数の大きな違いはデータフレームは全ての変数が **等長** でなければならない点です。
+
+```{r}
+df <- data.frame(x = 1:3, y = c("a", "b", "c"), z = c(TRUE, FALSE, FALSE),
+                 stringsAsFactors = FALSE)
+```
+
+```{r}
+str(df)
+```
+
+　  
+
+### 【演習】
+では、不等長のデータを指定した場合はどのようになるでしょうか？
+
+```{r}
+data.frame(x = 1:5, y = c("a", "b", "c"), stringsAsFactors = FALSE)
+```
+
+　  
+
+データフレームは等長なベクトル変数の集まりなので`[]`オペレータで参照することが可能です。
+
+```{r}
+df[2, ]
+```
+
+```{r}
+df[, 2]
+```
+
+```{r}
+df[2, 2]
+```
+
+データフレームは特殊なあリスト型とも言えますので`$`オペレータでの参照も可能です。
+
+```{r}
+df$x
+```
+
+```{r}
+df["y"]
+```
+
+　  
+
+### 【演習】
+上記の二つの参照方法は何が異なっているでしょうか？以下のチャンクに差を確認するためのコードを記述、実行して確認してみてください。
+
+```{r}
+
+```
+
+　  　  
+
+## Import data
+テキストでは分析対象となるデータをファイル（主にCSV形式）から読みこんでいます。
+
+```{r}
+usedcars <- read.csv("usedcars.csv", stringsAsFactors = TRUE, encoding = "CP932")
+usedcars
+```
+
+```{r}
+str(usedcars)
+```
+
+　  
+
+### 【演習】
+データフレームは前述のように全てのデータが等長である必要がありますが、データの一部が欠損しているファイルを読みこんだ場合は、どのようになるのでしょうか？
+
+```{r}
+read.csv("usedcars_loss.csv", stringsAsFactors = FALSE, encoding = "CP932")
+```
+
+Rでは欠損値を`NA`という「値がないことを示す特殊な定数」を使いますので、元データにおいて欠損値が単に空欄になっている場合には以下のように指定してください。
+
+```{r}
+read.csv("usedcars_loss.csv", stringsAsFactors = FALSE, na.strings = "",
+         encoding = "CP932")
+```
+
+最近のファイルは"UTF-8"でエンコーディングされていることが多いため、Windows環境では明示的にエンコーディングを指定する癖をつけておくことをおすゝめします。
+
+　  
+
+データがExcel形式で保管されている場合も多く、一旦、CSVに直す手間をかけず直接Excel形式を読みこみたい場合には`readxl`パッケージを用いてください。
+
+```{r}
+readxl::read_xlsx("usedcars.xlsx")
+```
+
+`sheet`オプションを指定ると任意のシートから読み込むことができます。
+
+```{r}
+readxl::read_xlsx("usedcars.xlsx", sheet = "wisc_bc_data")
+```
+
+処理結果をCSV形式で書出しExcelで扱いたい場合は`readr::write_excel_csv`が、おすゝめです。ExcelではUTF-8のCSVを識別するためにBOM（Byte Order Mark）という識別のためのデータが必要で、`readr::write_excel_csv`関数はこのBOMを含めたCSVファイルを書出してくれるためです。
+
+```{r, eval=FALSE}
+readr::write_excel_csv(usedcars, "write_excel.csv", na = "")
+```
+
+WindowsデフォルトのシフトJIS（CP932）で保存したい場合は`write.csv`関数で`fileEncoding = "CP932"`を指定してください。
+
+```{r}
+write.csv(usedcars, "write_cp932.csv", fileEncoding = "CP932")
+```
+
+　  
+
+# Working with dplyr
+ここからは、データフレームをより分かりやすく簡単に扱える`dplyr`パッケージのチュートリアルです。データ分析の大半は入手したデータを分析できるように整えるデータハンドリング作業になります。
+
+　  
+
+## 第３章の処理
+勉強会の第２回（第３章）の演習においてデータフレームの処理ミスが散見されましたが、`dply`パッケージを用いるとこのようなミスを低減することができます。
+
+
+### 【演習】
+以下のチャンクに`wisc_bc_data.csv`を`wbcd`に読みこむコードを記述、実行してテキストの第３章のようなデータになることを確認してみましょう。ついでにバックアップを作っておきます。
+
+```{r}
+wbcd <- 
+wbcd
+
+wbcd_org <- wbcd
+```
+
+　  
+
+読みこまれたらおまじないをひとつ実行してください。
+
+```{r}
+library(tidyverse)
+```
+
+テキストにしたがって、まずは、`id`フィーチャーを削除します。テキストでは以下のように指定していました。
+
+```{r}
+wbcd <- wbcd[-1]
+wbcd
+```
+
+これと同様な処理を`dplyr`パッケージを使うと以下のようになります。
+
+```{r}
+wbcd <- wbcd_org
+
+wbcd <- dplyr::select(wbcd, -id)
+wbcd
+```
+
+テキストの方法と`dplyr`パッケージを使う方法のどちらが分かりやすい（可読性が高い）ですか？
+
+次に`diagnosis`を因子型変数に変換してみます。
+```{r}
+wbcd_bak <- wbcd
+```
+
+
+テキストでは以下のように処理していました。
+
+```{r}
+wbcd$diagnosis <- factor(wbcd$diagnosis, levels = c("B", "M"))
+wbcd
+```
+
+これを`dplyr`パッケージを用いると
+
+```{r}
+wbcd <- wbcd_bak
+
+wbcd <- dplyr::mutate(wbcd,
+                      diagnosis = factor(diagnosis, levels = c("B", "M")))
+wbcd
+```
+
+```{r}
+wbcd_bak <- wbcd
+```
+
+各数値に対して最小最大正規化を行います。まず、最小最大正規化のための関数を定義します。
+
+```{r}
+normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x)))
+}
+```
+
+テキストでは`lapply`関数を用いていましたので、数値以外のデータが消えてしまいます。
+
+```{r}
+as.data.frame(lapply(wbcd[2:31], normalize))
+```
+
+`dplyr`パッケージを使うとデータフレームの特定変数に対してのみ関数を適用できますので、数値以外のデータも残ったままです。
+
+```{r}
+wbcd <- wbcd_bak
+
+dplyr::mutate_if(wbcd, is.numeric, normalize)
+```
+
+```{r}
+wbcd_bak <- wbcd
+```
+
+　  
+
+### 【演習】
+`dplyr`パッケージを用いて`wbcd`の数値データをZスコア正規化するコードを以下のチャンクで記述、実行してみてください。
+
+```{r}
+wbcd_z <- wbcd_bak
+
+
+```
+
+　  
+
+最後にトレーニング用とテスト用のデータに分割してみます。
+
+```{r}
+wbcd[1:469, ]
+```
+
+同様のことを`dplyr`パッケージを用いると以下のようになります。
+
+```{r}
+wbcd <- wbcd_bak
+
+dplyr::slice(wbcd, 1:469)
+```
+
+　  
+
+テキストのコード（Base R）と`dplyr`パッケージを用いたコードの比較を行ってきましたが、`dplyr`パッケージが実力を発揮するのはパイプ演算子（` %>% `）を用いた連続処理です。一連の処理はパイプ演算子を用いると以下のように記述できます。
+
+```{r}
+wbcd <- wbcd_org
+
+wbcd %>% 
+   dplyr::select(-id) %>% 
+   dplyr::mutate(diagnosis = factor(diagnosis, levels = c("B", "M"))) %>% 
+   dplyr::mutate_if(is.numeric, normalize) %>% 
+   dplyr::slice(1:469)
+```
+
+パイプ演算子は「左辺を右辺の第一引数に渡す」演算子で、このように中間変数を作成せず、可読性が高く、統一された文法で記述できます。パイプ演算子を使えるのが`dplyr`パッケージの強みです。
+
+　  
+
+## 第４章の処理
+では、第４章のようなクレンジング処理はどのように行うのでしょうか？
+
+```{r}
+"sms_spam.csv" %>% 
+   read.csv(encoding = "UTF-8") %>% 
+   dplyr::mutate(text_lower = tolower(text)) %>% 
+   dplyr::mutate(text_remove_num = tm::removeNumbers(text_lower)) %>% 
+   dplyr::mutate(text_remove_sw = tm::removeWords(text_remove_num,
+                                                  tm::stopwords()))
+```
+
+　  
+
+### 【演習】
+残るクレンジング処理（記号の削除とステミング）を以下のチャンクで記述、実行し確認してみましょう。
+
+```{r}
+"sms_spam.csv" %>% 
+   read.csv(encoding = "UTF-8") %>% 
+   dplyr::mutate(text_lower = tolower(text)) %>% 
+   dplyr::mutate(text_remove_num = tm::removeNumbers(text_lower)) %>% 
+   dplyr::mutate(text_remove_sw = tm::removeWords(text_remove_num,
+                                                  tm::stopwords())) %>% 
+
+```
+
+　  
+
+# ハリポタで学ぶ`dplyr`
+`dplyr`パッケージのより実践的な使い方を『ハリー・ポッター：魔法同盟』を題材に演習してみましょう。
+
+　  
+
+## ハリー・ポッター：魔法同盟
+[『ハリー・ポッター：魔法同盟』 <i class="fa fa-external-link"></i>](『ハリー・ポッター：魔法同盟』){target="_blank" title="トレーラー"} とは、Ingress や ポケモンGo を送り出した位置情報を用いたゲームを得意とする Naiantic によるハリー・ポッターを題材としたゲームです。別名、ハリポタGo。
+ゲームの中で9種類の魔法薬（ポーション、ドーピング薬）を27種の材料から調合し、これを利用することでゲームを有利に進めることが可能になります。ところが、仕様により無課金（無拡張）では最大数が以下のように限られています。
+
+種別   | 種類  | 最大数
+-------|-------|-----------
+魔法薬 | 9種類 | 50個
+材料   | 27種類 | 200個
+
+　  
+魔法薬のストックを切らさないために材料を効率よくストックしておくために材料のストック数を求めてみましょう。
+
+　  
+
+## 魔法薬レシピ
+魔法薬のレシピは`WizardUnite.xlsx`ファイルの`Recipe`シートにありますので、まずはこのシートを読みこみます。
+
+```{r}
+recipe <- "WizardUnite.xlsx" %>% 
+  readxl::read_excel(sheet = "Recipe")
+
+recipe
+```
+
+![](material.png)
+
+　  
+
+## 計算条件
+常備しておきたい魔法薬数と保有数を決めます。例が`WizardUnite.xlsx`ファイルの`Stock`シートにありますので、参照してみましょう。
+
+```{r}
+stock <- "WizardUnite.xlsx" %>% 
+  readxl::read_excel(sheet = "Stock")
+
+stock
+```
+
+　  
+
+### 【チーム演習】
+魔法薬レシピと希望数・保有数から必要となる材料の数を求めなさい。ただし、以下の条件を考慮すること。条件が不足している場合は各自が設定する。
+
+* 各魔法薬の希望数と保有数は**各自が設定**する
+      * `WizardUnite_temp.xlsx`ファイルを使用してください
+      * 保有数が希望数を超えていている魔法薬があっても構わない
+      * 「50 ≧ 希望数の合計 ＞ 保有数の合計」であること
+* 材料の合計数は200以下であること
+      * 合計数が200に大幅に満たない場合は予備用魔法薬の数を決め、極力、材料の合計数が200に近いようにする
+      * 予備用魔法薬数は各自が設定し、個々の魔法薬で異なっていても構わない
+* 計算にはdplyrパッケージを用いる
+* 計算手順を考えてからコーディングする
+
+　  
+
+#### ヒント
+* `dplyr`パッケージの以下の関数を使う必要があります。これらは未説明なのでチートシートなどを適宜調べて使ってください。
+      * `dplyr::left_join`
+      * `dplyr::group_by`
+      * `dplyr::summarise`
+
+　  
+
+### 解答記入用チャンク
+
+```{r}
+
+```
+
+　  
+
+# 最後に
+全てのチャンクで**エラーが出ないことを確認**したら、`setup`チャンク（上から二番目のチャンク）の最初の一行をコメントアウトして二行目をアンコメントし以下のように書き換えたら、エディタ上段にある[knit]ボタンをクリックしてみてください。
+
+```{r, eval=FALSE}
+# knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
+```
+
+　  
+
+## その他のチュートリアル
+本チュートリアルで説明していないRの基本的な事項に関しては [インタラクティブなチュートリアル <i class="fa fa-external-link"></i>](https://github.com/k-metrics/learnr){target="_blank" title="GitHub"} を公開していますので、そちらをご利用ください。
+
+　  
+
+---
+
+　  
+
+## [CC BY-NC-SA 4.0 <i class="fa fa-external-link"></i>](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja){target="_blank" title="ライセンスの要約"} , Sampo Suzuki
+
+* 表示
+    * あなたは 適切なクレジットを表示し、ライセンスへのリンクを提供し、変更があったらその旨を示さなければなりません。これらは合理的であればどのような方法で行っても構いませんが、許諾者があなたやあなたの利用行為を支持していると示唆するような方法は除きます。
+* 非営利
+    * あなたは営利目的でこの資料を利用してはなりません。
+* 継承
+    * もしあなたがこの資料をリミックスしたり、改変したり、加工した場合には、あなたはあなたの貢献部分を元の作品と同じライセンスの下に頒布しなければなりません。
+
+　  
+
+* 本資料中で引用してるロゴなどの著作権は原著作権者にあります。
