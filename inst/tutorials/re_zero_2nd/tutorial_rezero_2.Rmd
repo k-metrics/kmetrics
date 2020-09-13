@@ -1,0 +1,90 @@
+---
+title: "R Basics, Re:zero 2nd"
+output:
+  learnr::tutorial:
+    df_print: "paged"
+    highlight: textmate
+    md_extensions: -ascii_identifiers
+runtime: shiny_prerendered
+description: > 
+  『ゼロから始めるR入門 2nd』　2018年度データ分析勉強会特別回で用いた資料の一部を再整理し対話型チュートリアル形式にしました。
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = TRUE)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+require(learnr)
+require(tidyverse)
+
+if (getRversion() >= "3.6.0") {
+  RNGversion("3.5.3")     # R >= 3.6.0の場合のみ（前方互換性確保のため）
+}
+```
+
+## はじめに
+本チュートリアルは、2018年度データ分析勉強会特別回で用いた資料をチュートリアル形式にまとめなおしたものです。とにかくやってみようというスタンスで手を動かしてコードを書くことを前提に構成しています。  
+なお、本チュートリアルは『Base R Cheetsheet』（ [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)）のコードの一部を参考にしています。  
+
+　  
+
+### チュートリアルの使い方 {.tabset}
+各演習では以下のようなチュートリアルエリアが表示されます。解答コードを記述し`[Run Code]`ボタンをクリックすると実行結果が表示されると共に実行したことが記録されます。解答が分からない場合は`[Hint]`ボタンをクリックするとヒントが表示されます。ヒントに記載されているコードをコピーするには`[Copy to Clipboard[`ボタンをクリックしてください。解答をやり直す場合には`[Satrt Over]`ボタンをクリックしてから解答を記述し再実行します。  
+左側のメニュー最下部にある`[Start Over]`をクリックすると全ての学習記録がクリアされます。
+
+#### 設問
+`iris`データセットを表示してください。演習を実行したら［解説］タブをクリックします。
+```{r tutorial-example, exercise=TRUE, exercise.cap="演習タイトル"}
+# Write R code here
+```
+
+```{r tutorial-example-hint, exercise=FALSE}
+# Hint
+iris
+```
+---
+
+#### 解説
+解説がある場合は、このようなタブ形式で表示します。タブが表示されていない演習には解説がありません。
+```{r}
+head(iris)
+```
+---
+
+#### Tips
+ちょっと便利な使い方や知っておくと役立つ情報がある場合は、このようなタブを表示します。タブが表示されていない演習にはTipsはありません。
+
+---
+
+
+### Let's Start
+では、`[Next Topic]`ボタンをクリックしてチュートリアルを始めましょう。
+
+
+
+## データのインポート
+
+### 【演習】 {.tabset}
+
+#### 設問
+
+#### 解説
+
+#### Tips
+
+
+## Lisence
+[CC BY-NC-SA 4.0 <i class="fa fa-external-link"></i>](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja){target="_blank" title="ライセンスの要約"} , Sampo Suzuki
+
+* 表示
+    * あなたは 適切なクレジットを表示し、ライセンスへのリンクを提供し、変更があったらその旨を示さなければなりません。これらは合理的であればどのような方法で行っても構いませんが、許諾者があなたやあなたの利用行為を支持していると示唆するような方法は除きます。
+* 非営利
+    * あなたは営利目的でこの資料を利用してはなりません。
+* 継承
+    * もしあなたがこの資料をリミックスしたり、改変したり、加工した場合には、あなたはあなたの貢献部分を元の作品と同じライセンスの下に頒布しなければなりません。
+
+　  
+
+* 本資料中で引用してるロゴなどの著作権は原著作権者にあります。

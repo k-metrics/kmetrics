@@ -1,5 +1,5 @@
-\name{R Basics, zero}
-\alias{R Basics, zero}
+\name{R Basics, Re:zero}
+\alias{R Basics, Re:zero}
 \title{R再入門（2018年度データ分析勉会より）}
 \usage{
 click "Start Tutorial" in "Tutorial" pane.
