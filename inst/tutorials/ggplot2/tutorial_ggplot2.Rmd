@@ -121,7 +121,7 @@ library(tidyverse)
 
 
 ### 1. 描画対象となるデータを指定 {.tabset}
-描画対象として三種類のアヤメの花弁と萼片の測定結果がまとめらえている`iris`データセットを用います。
+描画対象として三種類のアヤメの花弁と萼片の測定結果がまとめらえている`iris`データセットを用います。`ggplot2`パッケージが扱える（`ggplot2`の関数へ入力できる）データは**データフレーム型**のみです。
 
 #### 設問
 1. `[Run Code]`をクリックして描画対象となるデータを確認しなさい
@@ -132,7 +132,7 @@ iris
 
 
 ### 2. 描くグラフの座標軸になる変数を指定 {.tabset}
-横軸（$X$軸）に萼片（Sepal）の幅（Width）、縦軸（$Y$軸）に萼片（Sepal）の長さ（Lenrth）を指定します。
+横軸（$X$軸）に萼片（Sepal）の幅（Width）、縦軸（$Y$軸）に萼片（Sepal）の長さ（Lenrth）を指定します。この処理でグラフ用紙が用意されるとイメージしてください。
 
 #### 設問
 1. `[Run Code]`をクリックして結果を確認しなさい
@@ -143,11 +143,19 @@ iris %>%
 ```
 
 #### 解説
-`ggplot2::aes`関数はグラフの座標を定義するための関数（エステティック関数）です。指定した変量がとる値の範囲（下表参照）から適切なフラフ座標を作成してくれます。
+`ggplot2::aes`関数はグラフの座標などを指定するための関数（エステティック関数）です。指定した変量がとる値の範囲（下表参照）から適切な目盛りのグラフ用紙（グラフ座標）を作成してくれます。
 ```{r, echo=FALSE}
 iris %>% 
   dplyr::summarise(Sepal.Wddth = range(Sepal.Width), Sepal.Length = range(Sepal.Length))
 ```
+
+#### Tisp
+`ggplot2::aes`関数は座標だけでなく、色やグルーピング（層別）などの指定もできます。詳細については、後ほど説明します。
+```{r, eval=FALSE}
+# Usage
+ggplot2::aes(x, y, ...)
+```
+
 
 
 ### 3. 描くフラフを指定 {.tabset}
@@ -164,7 +172,7 @@ iris %>%
 
 
 #### 解説
-`geom_point`関数を別のグラフ関数に置き換えることで様々なグラフが描けます。ただし、グラフにより横軸・縦軸の取る変量が異なりますので合わせてエステティック関数での指定を変更する必要はあります。  
+`geom_point`関数を別のグラフ関数に置き換えることで様々なグラフが描けます。ただし、グラフにより横軸・縦軸の取る変量が異なりますので合わせてエステティック関数での指定を変更する必要はあります。
 
 
 ### 描画の基本（箱ひげ図） {.tabset}
@@ -357,8 +365,16 @@ iris %>%
 ### タイトルをつける {.tabset}
 
 #### 設問
+1. タイトル「アヤメ萼片の幅と長さの関係」を追加しなさい
 
-```{r}
+```{r add-main-title, exercise=TRUE, exercise.lines=6}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point()
+
+```
+
+```{r add-main-title-hint}
 iris %>% 
   ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
     ggplot2::geom_point() +
@@ -366,21 +382,32 @@ iris %>%
 ```
 
 #### 解説
-`ggtitle`関数はタイトルとサブタイトルを指定するための関数です。書式は至ってシンプルでです。
+`ggtitle`関数はタイトルとサブタイトルを指定するための関数です。書式は至ってシンプルです。タイトルオプションを明示的にしていする際は`label`で指定することに注意してください。
 ```{r}
 iris %>% 
   ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
     ggplot2::geom_point() +
-    ggplot2::ggtitle(title = "アヤメ萼片の幅と長さの関係",
-                     subtitle = "Fisher's Iris")
+    ggplot2::ggtitle(label = "アヤメ萼片の幅と長さの関係", subtitle = "Fisher's Iris")
 ```
 
 
 ### 座標軸ラベルを変更する {.tabset}
-座標軸はデフォルトラベルとして`ggplot2::aes`関数で指定した変量名が使われますが、これを変更するには`xlab`関数と`ylab`関数を用います。
+座標軸のデフォルトラベルは`ggplot2::aes`関数で指定した変量名が使われます。座標軸のラベルを変更するには`xlab`関数と`ylab`関数を用います。
 
 #### 設問
-```{r}
+1. `iris`データセットを用いて
+1. 横軸に萼片幅（`Sepal.Width`）、縦軸に萼片長（`Sepal.Length`）を指定し
+1. 散布図（`geom_point`）を描き
+1. 軸ラベルを「萼片幅」と「萼片長」に直しなさい
+
+```{r update-axis-label, exercise=TRUE, exercise.lines=6}
+ %>% 
+  ggplot2::ggplot(ggplot2::aes(x = , y = )) +
+    ggplot2::geom_ +
+    ggplot2::xlab(label = "萼片幅") + ggplot2::ylab(label = "萼片長")
+```
+
+```{r update-axis-label-hint}
 iris %>% 
   ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
     ggplot2::geom_point() +
@@ -388,8 +415,8 @@ iris %>%
 ```
 
 
-#### Tips
-タイトルと軸名を指定するのに個別の関数を用いましたが、`labs`関数を使うと様々な指定が一括で行えます。
+### タイトルと座標軸ラベルを同時に指定する
+`labs`関数を使うと一つの関数でタイトルや座標軸ラベルなど複数の指定が可能です。
 ```{r}
 iris %>% 
   ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
@@ -401,51 +428,114 @@ iris %>%
 ```
 
 
-### 背景等を変える
-グラフ全体の色合い等を変える場合は`ggplot2::theme_`関数群を用います。デフォルトテーマを含め以下の8種類のテーマ関数が用意されています。  
+### グラフスタイルを変える {.tabset}
+`ggplot2`のデフォルトグラフスタイルが好みに合わない場合は`ggplot2::theme_`関数群で変更することができます。適用したいテーマの関数を下記のように指定するだけです。デフォルトテーマ（`theme_gray`）を除き$8$種類のテーマが用意されています。
 ```{r, eval=FALSE}
-# Usage
-theme_gray(base_size = 11, base_family = "")        # デフォルトテーマ
-theme_bw(base_size = 11, base_family = "")
-＃theme_linedraw(base_size = 11, base_family = "")
-theme_light(base_size = 11, base_family = "")
-theme_dark(base_size = 11, base_family = "")
-theme_minimal(base_size = 11, base_family = "")
-theme_classic(base_size = 11, base_family = "")
-theme_void(base_size = 11, base_family = "")
+iris %>% 
+  ggplot2::ggplot(aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() + ggplot2::xlab("") + ggplot2::ylab("") + 
+    ggplot2::theme_*()
 ```
 
 ```{r, echo=FALSE}
-gg_gray <- iris %>% 
-  ggplot2::ggplot(aes(x = Sepal.Width, y = Sepal.Length, colour = Species)) +
+gg <- iris %>% 
+  ggplot2::ggplot(aes(x = Sepal.Width, y = Sepal.Length)) +
     ggplot2::geom_point() + ggplot2::xlab("") + ggplot2::ylab("")
-gg_bw <- gg_gray + ggplot2::theme_bw() + ggplot2::ggtitle("theme_bw")
-gg_ld <- gg_gray + ggplot2::theme_linedraw() + ggplot2::ggtitle("theme_linedraw")
-gg_lt <- gg_gray + ggplot2::theme_light() + ggplot2::ggtitle("theme_light")
-gg_dk <- gg_gray + ggplot2::theme_dark() + ggplot2::ggtitle("theme_dark")
-gg_min <- gg_gray + ggplot2::theme_minimal() + ggplot2::ggtitle("theme_minimal")
-gg_cl <- gg_gray + ggplot2::theme_classic() + ggplot2::ggtitle("theme_classic")
-gg_vd <- gg_gray + ggplot2::theme_void() + ggplot2::ggtitle("theme_void")
 
-gridExtra::grid.arrange(gg_gray,
-                        gg_bw, gg_ld, gg_lt, gg_dk, gg_min, gg_cl, gg_vd,
-                        ncol = 2)
+gg_bw <- gg + ggplot2::theme_bw() + ggplot2::ggtitle("theme_bw")
+gg_ld <- gg + ggplot2::theme_linedraw() + ggplot2::ggtitle("theme_linedraw")
+gg_lt <- gg + ggplot2::theme_light() + ggplot2::ggtitle("theme_light")
+gg_dr <- gg + ggplot2::theme_dark() + ggplot2::ggtitle("theme_dark")
+gg_mi <- gg + ggplot2::theme_minimal() + ggplot2::ggtitle("theme_minimal")
+gg_cl <- gg + ggplot2::theme_classic() + ggplot2::ggtitle("theme_classic")
+gg_vo <- gg + ggplot2::theme_void() + ggplot2::ggtitle("theme_void")
+gg_ts <- gg + ggplot2::theme_test() + ggplot2::ggtitle("theme_test")
 ```
 
-`ggplot2::theme_classic`を用いてグラフテーマをクラッシックに設定してみます。  
-```{r, fig.cap="Fig.クラッシックテーマを設定して完了"}
+#### デフォルト
+```{r, echo=FALSE}
+gg + ggplot2::ggtitle("theme_gray or theme_grey, as default")
+```
+
+#### 例1〜2
+```{r, echo=FALSE}
+library(patchwork)
+gg_bw + gg_ld
+```
+
+#### 例3〜4
+```{r, echo=FALSE}
+library(patchwork)
+gg_lt + gg_dr
+```
+
+#### 例5〜6
+```{r, echo=FALSE}
+library(patchwork)
+gg_mi + gg_cl
+```
+
+#### 例7〜8
+```{r, echo=FALSE}
+library(patchwork)
+gg_vo + gg_ts
+```
+
+#### 設問
+1. `iris`データセットを用いて、品種（`Species`）ごとに萼片長（`Sepal.Length`）の箱ひげ図を描き
+1. `minimal`テーマを指定しなさい
+
+```{r theme-draw, exercise=TRUE}
+ %>% 
+  ggplot2::ggplot(ggplot2::aes(x = , y = )) + 
+    ggplot2:: + 
+    ggplot2::
+```
+
+```{r theme-draw-hint}
 iris %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length,
-                               colour = Species)) +
-    ggplot2::geom_point() +
-    ggplot2::ggtitle("みんな大好きiris") +
-    ggplot2::xlab("がく片の幅") + ggplot2::ylab("がく片の長さ") +
-    ggplot2::geom_smooth(method = "lm", se = TRUE, level = 0.95) +
-    ggplot2::theme_classic()
+  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length)) + 
+    ggplot2::geom_boxplot() + 
+    ggplot2::theme_minimal()
 ```
 
 
-　  
+### グラフ軸を操作する
+`ggplot2`パッケージでは座標軸はエステティック関数（`aes`）が自動的に計算してくれますが、自分で変更したい場合には`coord_`関数群を使います。例えば基本的には縦方向で描画される箱ひげ図を横向きに描く場合は以下のように`coord_flip`関数を指定するだけです。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length)) + 
+    ggplot2::geom_boxplot() + 
+    ggplot2::coord_flip()
+```
+
+
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) + 
+    ggplot2::geom_point() + 
+    ggplot2::coord_equal()
+```
+
+
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = log(Sepal.Width), y = log(Sepal.Length))) + 
+    ggplot2::geom_point()
+
+  iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) + 
+    ggplot2::geom_point() + 
+    ggplot2::coord_trans(x = "log", y = "log")
+```
+
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) + 
+    ggplot2::geom_point() +
+    ggplot2::scale_x_reverse()
+```
+
 
 ## 層別に描く
 
@@ -700,87 +790,6 @@ iris %>%
 ```
 　  
 
-## 軸の比率を変更する
-座標軸の範囲はデータに応じて自動的に決まりますが、ｘ軸とｙ軸の比率を変更することで見やすい、理解しやすいグラフになることがあります。このような場合には`ggplot2::coord_fixed`関数を用います。  
-```{r, eval=FALSE}
-# Usage
-coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE)
-```
-
-`ggplot2::coord_equal`関数というのもありますが、これは`ggplot2::coord_fixed`関数のエイリアス関数です。では、座標軸の比率を１（デフォルト値）に設定してみましょう。  
-```{r}
-iris %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length,
-                               colour = Species)) +
-    ggplot2::geom_point() +
-    ggplot2::ggtitle("みんな大好きiris") +
-    ggplot2::xlab("がく片の幅") + ggplot2::ylab("がく片の長さ") +
-    ggplot2::geom_smooth(method = "lm", se = TRUE) +
-    ggplot2::coord_fixed()
-```
-　  
-
-## 対数軸を用いる
-描画対象データのレンジが広い場合は対数軸で表示すると便利な時があります。`ggplot2`パッケージではデータを対数変換せずとも座標軸だけを対数表示してくれます。  
-対数軸グラフを描く場合は`ggplot2::cord_trans`関数または`ggplot2::scale_x_log10`、`ggplot2::scale_y_log10`両関数がありますが対数軸以外も描画可能な`ggplot2::cord_trans`関数を使うのがおすゝめです。  
-```{r, eval=FALSE}
-# Usage
-coord_trans(x = "identity", y = "identity", limx = NULL, limy = NULL,
-            xtrans, ytrans)
-```
-
-常用対数`log`を指定して対数軸グラフを描いてみます。データの範囲が狭いのでちょっと見難いですが対数軸で表示すると補助線の間隔が異なってることが分かります。  
-```{r}
-iris %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length,
-                               colour = Species)) +
-    ggplot2::geom_point() +
-    ggplot2::ggtitle("みんな大好きiris") +
-    ggplot2::xlab("がく片の幅") + ggplot2::ylab("がく片の長さ") +
-    ggplot2::geom_smooth(method = "lm", se = TRUE) +
-    ggplot2::coord_trans(x = "log", y = "log")
-```
-　  
-
-## 軸を入れ替る
-`ggplot2::coord_`関数群を用いるとデータを変更することなく軸の操作が可能です。横軸と縦軸を入れ替えるには`ggplot2::coord_flip`関数を用います。  
-```{r, eval=FALSE}
-# Usage
-coord_flip(xlim = NULL, ylim = NULL, expand = TRUE)
-```
-
-```{r}
-iris %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length,
-                               colour = Species)) + 
-    ggplot2::geom_boxplot() + 
-    ggplot2::coord_flip()
-```
-　  
-
-## 軸の反転
-軸を反転させるには`ggplot2::scale_x_reverse`、`ggplot2::scale_y_reverse`関数を用います。  
-```{r, eval=FALSE}
-# Usage
-scale_x_continuous(name = waiver(), breaks = waiver(), minor_breaks = waiver(),
-                   labels = waiver(), limits = NULL, expand = waiver(),
-                   oob = censor, na.value = NA_real_, trans = "identity",
-                   position = "bottom", sec.axis = waiver())
-
-scale_y_continuous(name = waiver(), breaks = waiver(), minor_breaks = waiver(),
-                   labels = waiver(), limits = NULL, expand = waiver(),
-                   oob = censor, na.value = NA_real_, trans = "identity",
-                   position = "left", sec.axis = waiver())
-```
-
-```{r}
-iris %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length,
-                               colour = Species)) + 
-    ggplot2::geom_point() + 
-    ggplot2::scale_x_reverse()
-```
-　  
 
 ## テキストラベルをつける
 個々のデータにテキストラベルを付与することも可能ですが、データ数が多かったりデータの値が近接していたりすると逆に見難くなってしまうというデメリットもあります。テキストやラベルを表示するには`ggplot2::geom_text`関数または`ggplot2::geom_label`関数を用います。  
