@@ -600,39 +600,39 @@ iris %>%
 
 
 
-### 層別の折線グラフ
-```{r}
-airquality %>% 
-  dplyr::mutate(Month = as.factor(Month)) %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, colour = Month)) + 
-    ggplot2::geom_line()
-```
-
+### 折線グラフ {.tabset}
 
 #### 設問
-```{r}
+1. `airquarity`データセットを用いて
+1. 月ごとの気温（`Temp`）の折線グラフを描きなさい
+
+```{r line-chart, exercise=TRUE}
 airquality %>% 
-  dplyr::mutate(Month = as.factor(Month)) %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Day, y = Ozone, colour = Month)) + 
-    ggplot2::geom_line()
+
 ```
 
-#### 解説
-
-```{r}
+```{r line-chart-hint}
 airquality %>% 
   dplyr::mutate(Month = as.factor(Month)) %>% 
   ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, colour = Month)) + 
     ggplot2::geom_line()
-
-airquality %>% 
-  dplyr::mutate(Month = as.factor(Month)) %>% 
-  ggplot2::ggplot(ggplot2::aes(x = Day, y = Ozone, colour = Month)) + 
-    ggplot2::geom_line()
 ```
 
 
-
+#### 解説
+`ggplot2`パッケージでは層別変量を`colour`オプションで指定する場合は名義尺度または順序尺度を用いるようにします。間隔尺度や比例尺度を用いると意図しないグラフが描かれる場合があります。
+```{r}
+airquality %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, colour = Month)) + 
+    ggplot2::geom_line()
+```
+　  
+このような場合、間隔尺度や比例尺度を指定したい場合には`group`オプションを合わせて指定するか、解答のように`factor`関数などを用いて尺度を名義尺度や順序尺度に変換してください。
+```{r}
+airquality %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, group = Month, colour = Month)) + 
+    ggplot2::geom_line()
+```
 
 
 
