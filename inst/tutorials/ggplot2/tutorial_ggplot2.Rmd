@@ -1,0 +1,637 @@
+---
+title: "R Basics, ggplot2"
+output:
+  learnr::tutorial:
+    df_print: "paged"
+    highlight: textmate
+    md_extensions: -ascii_identifiers
+runtime: shiny_prerendered
+description: > 
+  『ggplot2のすゝめ』：データ分析勉強会の初学者向け講義資料を再構成し対話型チュートリアル化しました。
+---
+
+```{r setup, include=FALSE}
+# 共通chunkオプションの指定
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+# 表示で利用する外部パッケージの読み込み
+require(gridExtra)
+require(DT)
+require(knitr)
+
+# データハンドリングで利用する外部パッケージの読み込み
+require(learnr)
+require(tidyverse)
+
+# ローカル定義関数の読み込み
+# source("./shared/common.R", encoding = "UTF-8")
+```
+
+
+## はじめに
+本チュートリアルはデータ分析勉強会の初学者向け講義で使用した『ggplot2 のすゝめ』を再構成し、対話型チュートリアル化したものです。  
+　
+
+### Rのグラフにおける課題
+Rのデフォルトグラフ描画関数は便利ですが、パラメータの指定方法が統一されていないなど初学者にとっては分かりにくい点があります。また、描画がシンプル過ぎて今時のレポートでは見栄えしにくいという面もあります。
+```{r, echo=FALSE}
+iris %>% 
+  with(plot(Petal.Width, Petal.Length))
+```
+
+　  
+
+### Package ggplot2
+`ggplot2`パッケージは上記のような課題を解決するためにグラフ描画に関わる文法の統一とエレガントな体裁を提供してくれます。例えば上の散布図を`ggplot2`パッケージで描くと
+```{r, echo=FALSE}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Petal.Width, y = Petal.Length)) + 
+    ggplot2::geom_point(ggplot2::aes(colour = Species))
+```
+
+では、実際にコードを実行しながら`ggplot2`パッケージの基本的な使い方を学びましょう。
+
+　  
+
+### チュートリアルの使い方 {.tabset}
+演習では説明の後にコードが実行できるチュートリアルエリアが表示されます。  
+
+1. 設問にしたがい必要に応じてコードを記述する
+    * 改行すれば行は自動的に追加される
+1. `[Run Code]`ボタンをクリックしてコードを実行する
+    * コードを実行すると学習記録が保存される（演習タイトルにチェックマークが付く）
+    * エラーが表示された場合はコードを修正して再実行する
+1. 記述するコードが分からない場合には`[Hint]`ボタンをクリックする
+    * ヒントに記載されているコードをコピーするには`[Copy to Clipboard]`ボタンをクリックする
+    * コードをペーストするにはキーボードの`[CtrL]+[v]`を押下する
+1. 最初からやり直す場合は`[Satrt Over]`ボタンをクリックする
+1. 学習記録をクリアする場合は左側のメニュー最下部にある`[Start Over]`をクリックする
+
+　  
+
+#### 設問
+1. `iris`データセットを表示するコードを記述して実行しなさい
+    * コードが分からない場合は`[HInt]`ボタンをクリックしなさい
+1. `iris`データセットが表示されたら`[解説]`タブをクリックしなさい 
+
+```{r tutorial-example, exercise=TRUE}
+# Write R code here
+```
+
+```{r tutorial-example-hint, exercise=FALSE}
+# Hint
+iris
+```
+
+
+#### 解説
+* 解説がある場合にはタブ形式で表示します（解説がない演習もあります）
+1. `[Tips]`タブをクリックしなさい
+
+```{r}
+head(iris)
+```
+
+
+#### Tips
+* ちょっと便利な使い方や知っておくと役立つ情報がある場合はタブで表示します（Tipsがない演習もあります）
+
+
+### Let's Start
+では、`[Next Topic]`ボタンをクリックしてチュートリアルを始めましょう。
+
+
+
+## 描画の基本
+`ggplot2`パッケージは`tidyverse`パッケージ・ファミリーですので、`dplyr`パッケージや`tidyr`パッケージとの親和性が高く、データフレーム型を入力データとしています。また、描画のための統一的な文法が定義されており様々なグラフを以下のような手順で描くことができます。  
+
+1. 描画対象となるデータを指定する
+1. 描くグラフの座標軸になる変数を指定する
+1. 描くフラフを指定する
+
+では、手順をなぞりながらコードを実行してみます。
+
+
+### 0. パッケージの読み込み
+本チュートリアルでは実行不要ですが、実際に`ggplot2`パッケージを利用する際には最初に下記のコードを実行し必要なパッケージを読み込んでおきます。
+```{r}
+library(tidyverse)
+```
+
+
+### 1. 描画対象となるデータを指定 {.tabset}
+描画対象として三種類のアヤメの花弁と萼片の測定結果がまとめらえている`iris`データセットを用います。`ggplot2`パッケージが扱える（`ggplot2`の関数へ入力できる）データは**データフレーム型**のみです。
+
+#### 設問
+1. `[Run Code]`をクリックして描画対象となるデータを確認しなさい
+
+```{r step-1, exercise=TRUE}
+iris
+```
+
+
+### 2. 描くグラフの座標軸になる変数を指定 {.tabset}
+横軸（$X$軸）に萼片（Sepal）の幅（Width）、縦軸（$Y$軸）に萼片（Sepal）の長さ（Lenrth）を指定します。この処理でグラフ用紙が用意されるとイメージしてください。
+
+#### 設問
+1. `[Run Code]`をクリックして結果を確認しなさい
+
+```{r step-2, exercise=TRUE}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length))
+```
+
+#### 解説
+`ggplot2::aes`関数はグラフの座標などを指定するための関数（エステティック関数）です。指定した変量がとる値の範囲（下表参照）から適切な目盛りのグラフ用紙（グラフ座標）を作成してくれます。
+```{r, echo=FALSE}
+iris %>% 
+  dplyr::summarise(Sepal.Wddth = range(Sepal.Width), Sepal.Length = range(Sepal.Length))
+```
+
+#### Tisp
+`ggplot2::aes`関数は座標だけでなく、色やグルーピング（層別）などの指定もできます。詳細については、後ほど説明します。
+```{r, eval=FALSE}
+# Usage
+ggplot2::aes(x, y, ...)
+```
+
+
+
+### 3. 描くフラフを指定 {.tabset}
+最後に`ggplot2::geom_point`関数を用いて散布図を描きます。
+
+#### 設問
+1. `[Run Code]`をクリックして結果を確認しなさい
+
+```{r step-3, exercise=TRUE}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point()
+```
+
+
+#### 解説
+`geom_point`関数を別のグラフ関数に置き換えることで様々なグラフが描けます。ただし、グラフにより横軸・縦軸の取る変量が異なりますので合わせてエステティック関数での指定を変更する必要はあります。
+
+
+### 描画の基本（箱ひげ図） {.tabset}
+先程は二変量の関係を知るために有用な散布図を描きましたが、同じデータを使って一変量の値の分布を把握したり比較するのに便利な箱ひげ図を描きます。  
+
+箱ひげ図は名義尺度もしくは順序尺度の変量を横軸に、縦軸には間隔尺度や比例尺度など数値のデータを指定します。
+
+
+#### 設問
+1. `iris`データセットを用いて
+1. 横軸に`Species`（品種）、縦軸に`Sepal.Length`（萼片の長さ）を指定し
+1. 箱ひげ図（`geom_boxplot`）を描きなさい
+
+```{r draw-boxplot, exercise=TRUE}
+ %>% 
+  ggplot2::ggplot(ggplot2::aes(x = , y = )) +
+    ggplot2::geom_()
+```
+
+```{r draw-boxplot-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length)) +
+    ggplot2::geom_boxplot()
+```
+
+
+#### 解説
+基本は散布図を描く場合と同じです。
+
+
+### まとめ
+`ggplot2`パッケージはデジタル地図で使われているレイヤー構造のように描画対象を順番に指定することにより様々なグラフを描くことができます。まずは、この基本を身につけましょう。
+
+
+
+## 様々なグラフ
+ソフトウェアメトリクス分析でよく使われるグラフを描いてみます。
+
+
+### ヒストグラム {.tabset}
+箱ひげ図とならんで変量がとる値の分布を見るのがヒストグラムです。ヒストグラムを描くには`geom_histgram`関数を用います。
+
+#### 設問
+1. `iris`データセットを用いて
+1. `Sepal.Width`（萼片の幅）のヒストグラムを描きなさい
+
+```{r draw-histgram, exercise=TRUE}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width)) + 
+    ggplot2::geom_histogram()
+```
+
+```{r draw-histgram-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width)) + 
+    ggplot2::geom_histogram()
+```
+
+
+#### 解説
+`ggplot2`で描くヒストグラムは指定された変量がとる値の範囲を$30$分割（ビン数=$30$）して描きます。階級を変更する場合は以下のオプションのどれかで指定してください。
+
+Option   | 内容             | 備考
+---------|------------------|---------------------------------------------------
+bins     | ビン数（分割数） | デフォルト（bins = 30）
+binwidth | 階級幅           | 
+breaks   | 階級             | 等幅であれば`pretty`関数を使って計算したものを指定します
+
+
+#### Tips
+`histgram`関数のようにスタージェスの公式に基づく階級を指定する場合は`pretty`関数を使って以下のように指定します。
+```{r}
+breaks <- with(iris, pretty(Sepal.Width, nclass.Sturges(Sepal.Width)))
+
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width)) + 
+    ggplot2::geom_histogram(breaks = breaks)
+```
+
+
+### 回帰図 {.tabset}
+（単）回帰分析では必ず出てくる回帰図は散布図と回帰直線を組み合わせることで描きます。回帰直線は`geom_smooth`関数に`mothod = "lm"`オプションを指定します。
+
+
+#### 設問
+1. `iris`データセットを用いて
+1. 横軸に`Petal.Width`（花弁の幅）、縦軸に`Petal.Length`（花弁の長さ）を指定し
+1. 散布図（`geom_point`）を描き
+1. 回帰直線（`geom_smooth`）を描きなさい
+
+```{r draw-lm, exercise=TRUE}
+ %>% 
+  ggplot2::ggplot(ggplot2::aes(x = , y = )) + 
+    ggplot2::geom_ + 
+    ggplot2::geom_
+```
+
+```{r draw-lm-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Petal.Width, y = Petal.Length)) + 
+    ggplot2::geom_point() + 
+    ggplot2::geom_smooth(method = "lm")
+```
+
+
+#### 解説
+`ggplot2`パッケージでは座標が同じ場合は簡単にグラフを重ねることができます。回帰直線にあるグレーのエリアは$95%$信頼区間です。信頼区間を描きたくない場合は`se = FALSE`オプションを指定してください。その他のオプションについてはヘルプを参照してください。
+
+
+### 折線グラフ {.tabset}
+折線グラフは時系列グラフに代表されるように横軸の値に順序関係がある順序尺度や間隔尺度を利用する場合に使われます。折線グラフを描くには`geom_line`関数を使います。  
+この演習では1973年5月〜9月のニューヨークにおける日次の大気観測データ（`airqualirty`データセット）を用います。
+```{r}
+airquality
+```
+
+
+#### 設問
+1. `ariquarity`データセットを用いて
+1. $5$月のデータを用いて
+1. 温度（`Temp`）の日毎の変化を折線グラフとして描きなさい。
+
+```{r draw-line, exercise=TRUE}
+ %>% 
+  dplyr::filter(Month == ) %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = )) + 
+    ggplot2::geom_
+```
+
+```{r draw-line-hint}
+airquality %>% 
+  dplyr::filter(Month == 5) %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp)) + 
+    ggplot2::geom_line()
+```
+
+
+#### 解説1
+`geom_line`関数は欠損値（欠測値、`NA`）がある場合、欠損値の部分に関しては折線を描画しません。
+```{r}
+airquality %>% 
+  dplyr::filter(Month == 7) %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Ozone)) + 
+    ggplot2::geom_line()
+```
+
+#### 解説2
+横軸（`x`）に指定する変量に同値があった場合は出現順に複数の折線がプロットされますので横軸（`x`）に指定する変量が取る値はユニークであることを確認してください。
+```{r}
+airquality %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Ozone)) + 
+    ggplot2::geom_line()
+```
+
+
+#### Tips
+時系列データの分析を行う場合には時系列クラス（Time Serise、`ts`クラス）を用いてプロットした方が適している場合もあります。目的に応じて使い分けてください。
+```{r}
+airquality %>% 
+  dplyr::select(-Month, -Day) %>% 
+  ts() %>% plot(main = "tsクラスによる時系列プロット")
+```
+
+
+
+
+
+
+
+### ドットチャート {.tabset}
+
+#### 設問
+
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length)) + 
+    ggplot2::geom_jitter()
+    # ggplot2::geom_dotplot(binaxis = "y", stackdir = "center")
+```
+
+
+#### 解説
+
+#### Tips
+
+
+
+## 様々な描画オプション
+
+### タイトルをつける {.tabset}
+
+#### 設問
+1. タイトル「アヤメ萼片の幅と長さの関係」を追加しなさい
+
+```{r add-main-title, exercise=TRUE, exercise.lines=6}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point()
+
+```
+
+```{r add-main-title-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() +
+    ggplot2::ggtitle("アヤメ萼片の幅と長さの関係")
+```
+
+#### 解説
+`ggtitle`関数はタイトルとサブタイトルを指定するための関数です。書式は至ってシンプルです。タイトルオプションを明示的にしていする際は`label`で指定することに注意してください。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() +
+    ggplot2::ggtitle(label = "アヤメ萼片の幅と長さの関係", subtitle = "Fisher's Iris")
+```
+
+
+### 座標軸ラベルを変更する {.tabset}
+座標軸のデフォルトラベルは`ggplot2::aes`関数で指定した変量名が使われます。座標軸のラベルを変更するには`xlab`関数と`ylab`関数を用います。
+
+#### 設問
+1. `iris`データセットを用いて
+1. 横軸に萼片幅（`Sepal.Width`）、縦軸に萼片長（`Sepal.Length`）を指定し
+1. 散布図（`geom_point`）を描き
+1. 軸ラベルを「萼片幅」と「萼片長」に直しなさい
+
+```{r update-axis-label, exercise=TRUE, exercise.lines=6}
+ %>% 
+  ggplot2::ggplot(ggplot2::aes(x = , y = )) +
+    ggplot2::geom_ +
+    ggplot2::xlab(label = "萼片幅") + ggplot2::ylab(label = "萼片長")
+```
+
+```{r update-axis-label-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() +
+    ggplot2::xlab(label = "萼片幅") + ggplot2::ylab(label = "萼片長")
+```
+
+
+### タイトルと座標軸ラベルを同時に指定する
+`labs`関数を使うと一つの関数でタイトルや座標軸ラベルなど複数の指定が可能です。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(title = "アヤメ萼片の幅と長さの関係",
+                  subtitle = "Fisher's Iris",
+                  x = "萼片幅", y = "萼片長", 
+                  caption = "CAPTION", tag = "TAG")
+```
+
+
+### グラフスタイルを変える {.tabset}
+`ggplot2`のデフォルトグラフスタイルが好みに合わない場合は`ggplot2::theme_`関数群で変更することができます。適用したいテーマの関数を下記のように指定するだけです。デフォルトテーマ（`theme_gray`）を除き$8$種類のテーマが用意されています。
+```{r, eval=FALSE}
+iris %>% 
+  ggplot2::ggplot(aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() + ggplot2::xlab("") + ggplot2::ylab("") + 
+    ggplot2::theme_*()
+```
+
+```{r, echo=FALSE}
+gg <- iris %>% 
+  ggplot2::ggplot(aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() + ggplot2::xlab("") + ggplot2::ylab("")
+
+gg_bw <- gg + ggplot2::theme_bw() + ggplot2::ggtitle("theme_bw")
+gg_ld <- gg + ggplot2::theme_linedraw() + ggplot2::ggtitle("theme_linedraw")
+gg_lt <- gg + ggplot2::theme_light() + ggplot2::ggtitle("theme_light")
+gg_dr <- gg + ggplot2::theme_dark() + ggplot2::ggtitle("theme_dark")
+gg_mi <- gg + ggplot2::theme_minimal() + ggplot2::ggtitle("theme_minimal")
+gg_cl <- gg + ggplot2::theme_classic() + ggplot2::ggtitle("theme_classic")
+gg_vo <- gg + ggplot2::theme_void() + ggplot2::ggtitle("theme_void")
+gg_ts <- gg + ggplot2::theme_test() + ggplot2::ggtitle("theme_test")
+```
+
+#### デフォルト
+```{r, echo=FALSE}
+gg + ggplot2::ggtitle("theme_gray or theme_grey, as default")
+```
+
+#### 例1〜2
+```{r, echo=FALSE}
+library(patchwork)
+gg_bw + gg_ld
+```
+
+#### 例3〜4
+```{r, echo=FALSE}
+library(patchwork)
+gg_lt + gg_dr
+```
+
+#### 例5〜6
+```{r, echo=FALSE}
+library(patchwork)
+gg_mi + gg_cl
+```
+
+#### 例7〜8
+```{r, echo=FALSE}
+library(patchwork)
+gg_vo + gg_ts
+```
+
+#### 設問
+1. `iris`データセットを用いて、品種（`Species`）ごとに萼片長（`Sepal.Length`）の箱ひげ図を描き
+1. `minimal`テーマを指定しなさい
+
+```{r theme-draw, exercise=TRUE}
+ %>% 
+  ggplot2::ggplot(ggplot2::aes(x = , y = )) + 
+    ggplot2:: + 
+    ggplot2::
+```
+
+```{r theme-draw-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length)) + 
+    ggplot2::geom_boxplot() + 
+    ggplot2::theme_minimal()
+```
+
+
+### グラフ軸を操作する {.tabset}
+`ggplot2`パッケージでは座標軸はエステティック関数（`aes`）が自動的に計算してくれますが、自分で変更したい場合には`coord_`関数群を使います。  
+
+
+#### 軸を入れ替える
+例えば基本的には縦方向で描画される箱ひげ図を横向きに描く（軸を入れ替える）場合には以下のように`coord_flip`関数を指定します。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Species, y = Sepal.Length)) + 
+    ggplot2::geom_boxplot() + 
+    ggplot2::coord_flip()
+```
+
+
+#### 等比率で描く
+前述のように`ggplot2`パッケージではエステティック関数（`aes`）が自動的に座標軸を計算しますが、場合によっては横軸と縦軸を同比率（アスペクト比$=1$）で表示したい場合もあります。そのような場合には`coord_equal`関数を用います。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) + 
+    ggplot2::geom_point() + 
+    ggplot2::coord_equal()
+```
+
+
+#### 対数軸で描く
+対象データが取る範囲が二桁以上異なるようなデータを描くには、軸を対数軸を用いた方が分かりやすい場合があります。`coord_trans`関数を用いると元データを変換することなく対数軸に限らず任意の軸でグラフを描画することができます。この関数の便利なところは元データを変換していませんので軸目盛りが元の値のままだというところです。
+```{r}
+ggplot2::diamonds %>% 
+  ggplot2::ggplot(ggplot2::aes(x = carat, y = price)) +
+    ggplot2::geom_point() + 
+    ggplot2::coord_trans(x = "log", y = "log")
+```
+
+
+#### 軸を反転させる
+通常、グラフ軸は左下を原点とし、右/上方向に向かって値が大きくなりますが、この軸を反転させたい場合には`scale_x_reverse`関数/`scale_y_reverse`関数を用います。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) + 
+    ggplot2::geom_point() +
+    ggplot2::scale_x_reverse()
+```
+
+
+## 層別に描く
+層別（因子の水準別）のグラフが簡単に描けるのが`ggplot2`パッケージがもつアドバンテージの一つです。例えば、`iris`データセットは品種(`Species`)という因子データを持っており、その中には三つの水準があります。これを利用して前出の散布図を水準別に色分けして描くには以下のようにエステティック関数（`aes`関数）内で`colour`オプションを指定します。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+  ggplot2::geom_point(ggplot2::aes(colour = Species))
+```
+　  
+`versicolor`は`virginica`に比べて萼片の幅、長さとも小さい傾向があるようですが、あまり変わらいサンプルも多く見受けられます。一方、`setosa`は他の二品種に比べると萼片が幅広短小にある傾向が見て取れます。このように水準別で描くことにより、今まで見えなかった傾向が見えてくる場合があります。データラングリングにおいては水準別に可視化することは重要なポイントの一つで、`ggplot2`パッケージは、その手助けをしてくれます。
+
+
+### 層別プロットのポイント {.tabset}
+エステティック関数（`aes`関数）は、`geom_`関数内でも指定が可能です。`ggplot`関数と`geom_`関数で指定するのでは、どのような違いがあるのでしょうか？
+
+
+#### 設問
+1. 以下のコードを実行してどのようなグラフが描かれるかを確認しなさい
+1. コードを修正して水準別に回帰直線を描きなさい
+
+```{r aes-function, exercise=TRUE}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point(ggplot2::aes(colour = Species)) + 
+    ggplot2::geom_smooth(method = "lm")
+```
+
+```{r aes-function-hint}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point(ggplot2::aes(colour = Species)) + 
+    ggplot2::geom_smooth(ggplot2::aes(colour = Species), method = "lm")
+```
+
+
+#### 解説
+エステティック関数（`aes`関数）は、指定した関数内（レイヤー内）のみが有効範囲です。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length)) +
+    ggplot2::geom_point() + 
+    ggplot2::geom_smooth(ggplot2::aes(colour = Species), method = "lm")
+```
+
+
+#### 例外
+`ggplot`関数で指定した場合は、グラフ用紙（ベース）に指定していますので、その上の全レイヤーに対して有効になります。
+```{r}
+iris %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Sepal.Width, y = Sepal.Length, colour = Species)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_smooth(method = "lm")
+```
+
+
+
+
+### 折線グラフ {.tabset}
+
+#### 設問
+1. `airquarity`データセットを用いて
+1. 月ごとの気温（`Temp`）の折線グラフを描きなさい
+
+```{r line-chart, exercise=TRUE}
+airquality %>% 
+
+```
+
+```{r line-chart-hint}
+airquality %>% 
+  dplyr::mutate(Month = as.factor(Month)) %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, colour = Month)) + 
+    ggplot2::geom_line()
+```
+
+
+#### 解説
+`ggplot2`パッケージでは層別変量を`colour`オプションで指定する場合は名義尺度または順序尺度を用いるようにします。間隔尺度や比例尺度を用いると意図しないグラフが描かれる場合があります。
+```{r}
+airquality %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, colour = Month)) + 
+    ggplot2::geom_line()
+```
+　  
+このような場合、間隔尺度や比例尺度を指定したい場合には`group`オプションを合わせて指定するか、解答のように`factor`関数などを用いて尺度を名義尺度や順序尺度に変換してください。
+```{r}
+airquality %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Day, y = Temp, group = Month, colour = Month)) + 
+    ggplot2::geom_line()
+```
+
+

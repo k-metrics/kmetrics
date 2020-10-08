@@ -8,7 +8,7 @@ Description: in-IDE tutorials in japanese.
     This package contains tutorials ONLY.
 Depends: R (>= 3.6.0)
 Imports: learnr, shiny, tidyverse
-Suggests: knitr, rmarkdown, htmltools
+Suggests: knitr, rmarkdown, htmltools, forecast
 URL: https://github.com/k-metrics/kmetrics
 License: MIT License
 Encoding: UTF-8
