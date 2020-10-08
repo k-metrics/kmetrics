@@ -17,7 +17,10 @@ tutorial）](https://blog.rstudio.com/2020/02/25/rstudio-1-3-integrated-tutorial
 | -------- | ------------------------------------------ | ----------------- |
 | R        | 3.6.0 or later                             | 4.0.x 推奨          |
 | RStudio  | 1.3 or later                               | Desktop or Server |
-| Packages | learnr, shiny, tidyverse, knitr, rmarkdown | 事前インストールをおすゝめします  |
+| Packages | learnr, shiny, tidyverse, knitr, rmarkdown | 事前インストールをおすゝめします。 |
+
+　  
+その他、各チュートリアルファイルで必要なパッケージがあります。チュートリアルが実行できない場合はヘルプを参照して必要なパッケージをインストールしてください。
 
 　
 
