@@ -1,0 +1,88 @@
+---
+title: "R Basics, forcats"
+output:
+  learnr::tutorial:
+    df_print: "paged"
+    highlight: textmate
+    md_extensions: -ascii_identifiers
+    # theme: lumen
+runtime: shiny_prerendered
+description: > 
+  名義尺度や順序尺度をあつかうのに便利なカテゴリカル変数（因子型変数）の操作に特化したforcatsパッケージに関するチュートリアルです。
+---
+
+<!-- 必要なパッケージ
+本チュートリアルファイルを実行するためには以下のパッケージが必要です。必ず
+インストールされていることを確認して下さい。
+
+knitr, learnr, rmarkdown, shiny, tidyverse
+
+インストールされていない場合、以下のページを参考にパッケージをインストール
+してください。
+
+https://k-metrics.github.io/cabinet/program/env/install_chk.html
+-->
+
+```{r setup, include=FALSE}
+# 共通chunkオプションの指定
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+require(learnr)
+require(tidyverse)
+require(magrittr)
+```
+
+## はじめに
+`forcats`パッケージはカテゴリカル変数（因子型変数）の操作に特化したパッケージです。Rのカテゴリカル変数（因子型変数）は一見、文字型や数値型のように見えますが、実体は個々の値が単位ごとに整数型でインデックス化されたデータベースのような変数です。例えば
+```{r}
+x <- c("a", "c", "b", "a", "b")
+x
+```
+という長さ5の文字型ベクトル変数をカテゴリカル変数（因子型変数）にすると
+```{r}
+f <- factor(x)
+f
+```
+となり、水準（`levels`）と呼ばれる整数型の属性（インデックス）がついていることが分かります。長さ5の文字型の部分はこの水準で管理されています。`unclass`という関数を使うとその構造の違いがひと目で分かります。
+```{r}
+unclass(x)
+```
+```{r}
+unclass(f)
+```
+
+カテゴリカル変数（因子型）変数は、このような構造を持っているため、
+
+
+## Appendix
+更に詳しくRを学ぶには以下の図書やコミュニティを活用してください。
+
+統計の基礎とRで処理方法を学びたい場合は[改定版 統計学基礎][B1]や[Rで楽しむ統計][B2]。
+Rの基礎から学びたい場合は[みんなのR][B3]や[パーフェクトR][B4]。  
+
+ネットコミュニティで質問したい場合は、日本のR界の著名人が集まっている[R-wakalang][C1]や
+[Rjp Wiki][C2]で、検索にはRに特化した検索エンジンである[seek R][C3]がすゝめです。
+
+　  
+
+---
+
+![Sampo Suzuki][CCI]
+[CC BY-NC-SA 4.0][CC], Sampo Suzuki [`r format(Sys.time(), format = '%F (%Z)')`]
+
+[0]: https://sites.google.com/site/kantometrics/ "データ分析勉強会"
+[CC]: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja "CC BY-NC-SA 4.0"
+[CCI]: https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "CC BY-NC-SA 4.0 icon"
+[RS]: https://www.rstudio.com/ "RStudio"
+
+<!-- Books -->
+[B1]: http://www.tokyo-tosho.co.jp/books/978-4-489-02227-2/ "統計学基礎"
+[B2]: http://www.kyoritsu-pub.co.jp/bookdetail/9784320112414 "Rで楽しむ統計"
+[B3]: https://book.mynavi.jp/ec/products/detail/id=39763 "みんなのR"
+[B4]: http://gihyo.jp/book/2017/978-4-7741-8812-6 "パーフェクトR"
+
+<!-- Net Community -->
+[C1]: http://qiita.com/uri/items/5583e91bb5301ed5a4ba "R-wakalang"
+[C2]: http://www.okadajp.org/RWiki/ "RjpWiki"
+[C3]: http://seekr.jp/ "seek R"
