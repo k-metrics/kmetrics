@@ -1,0 +1,370 @@
+---
+title: "tidyrと隠された便利関数"
+output:
+  learnr::tutorial:
+    df_print: "paged"
+    highlight: textmate
+    md_extensions: -ascii_identifiers
+    # theme: lumen
+runtime: shiny_prerendered
+description: > 
+  **Japanese** Tutorial, あまり紹介されないtidyrパッケージの便利関数に関するチュートリアル
+---
+
+<!-- 必要なパッケージ
+本チュートリアルファイルを実行するためには以下のパッケージが必要です。必ず
+インストールされていることを確認して下さい。
+
+knitr, learnr, rmarkdown, shiny, tidyverse
+
+インストールされていない場合、以下のページを参考にパッケージをインストール
+してください。
+
+https://k-metrics.github.io/cabinet/program/env/install_chk.html
+-->
+
+```{r setup, include=FALSE}
+# 共通chunkオプションの指定
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = TRUE)
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+require(learnr)
+require(tidyverse)
+```
+
+## はじめに
+`tidyr`パッケージの紹介では`pivot_longerpivot_wider`（旧`gather/spread`）関数や`separate/unite`関数ばかりが紹介されています。しかし、あまり紹介されない関数の中には非常に便利な関数が用意されているので使わない手はありません。本チュートリアルは、これら隠された便利関数に関するチュートリアルです。  
+
+　  
+
+## 欠損と欠落
+関数を紹介する前にデータ分析における「データの一部がない」ということについて整理しておきます。実際の分析対象データにはなんらかの理由で「データの一部がない」というケースが多々あります。逆にいえば完全にそろっているデータの方が稀有です。この「データの一部がない」という状態は以下の二つの状態のどれか、または、どちらもと言えます。  
+　  
+
+* 観測値の一部がない（セルに抜けがある）
+* 観測記録の一部がない（行に抜けがある）
+
+　  
+本チュートリアルでは、この二つの状態を区別するために前者を「欠損（`NA`）」、後者を便宜的に「欠落」と呼びます。  
+　  
+欠落は観測記録（インスタンス）が取得できない場合もありますが、観測値が全てない、もしくは、観測値の値がそのデータになくても読み手が困らない値（例えば、本日の交通死者数というのは表示されていない場合、読み手がゼロだろうと推測できる）のために記録を省略している場合もあります。このように記録されていないけれども人が意味を読み取れるような状態を本チュートリアルでは「暗黙的な欠落」と呼びます。  
+　  
+暗黙の欠落は人が見る限りあまり問題になりませんが、可視化や分析の際に正しく処理できない場合があります。  
+
+　  
+
+## 欠損の例
+まず、Rにおける欠損とはどのようなものなのかを理解しましょう。ニューヨークの大気観測データ（`airauality`データセット）には、1973年の5月1日から9月30日までの153日間の観測データが収められています。このデータセットは個々の観測値（変量）が部分的に欠損（値が`NA`になっている）していますが、日々の記録（インスタンス）自体は欠落していません。このように個々の観測値が抜けている状態を欠損と呼び、その値を欠損値（`NA`と表現）といいます。  
+　  
+```{r, echo=FALSE}
+airquality
+```
+
+　  
+
+## 欠落の例
+一方、「暗黙的な欠落」とは、日々の記録の一部が抜けているような状態、例えば、新型コロナウィルス検査における陽性確定者数データのようなデータが暗黙的な欠落の代表的なデータです。  
+陽性確定者数がゼロの日は確定者に関する記録（インスタンス）自体がありませんので、集計した際にはゼロの日が含まれてません。例えば下表の2020年1月16日〜1月23日の間、1月27日、2月2日〜3日が暗黙的な欠落になっていことが分かります。  
+　  
+```{r, echo=FALSE}
+path <- "https://raw.githubusercontent.com/reustle/covid19japan-data/master/"
+path <- paste0(path, "docs/patient_data/")
+
+df <- path %>% 
+  paste0("latest.json") %>% 
+  readr::read_lines() %>% 
+  paste0(path, .) %>% 
+  jsonlite::fromJSON() %>% 
+  dplyr::group_by(dateAnnounced) %>% 
+  dplyr::summarise(n = n()) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::slice(1:10) %>% 
+  dplyr::mutate(date = lubridate::as_date(dateAnnounced)) %>% 
+  dplyr::select(date, n)
+# df %>% readr::write_excel_csv("covid.csv")
+df
+```
+
+　  
+
+## 暗黙的な欠落の問題点
+暗黙的な欠落があるデータを可視化すると以下のようなグラフになります。
+```{r, echo=FALSE}
+df %>% 
+  ggplot2::ggplot(ggplot2::aes(x = date, y = n)) + 
+    ggplot2::geom_line()
+```
+　  
+本来であれば、暗黙的な欠落部分はゼロとして表示されなければなりません。また、欠落している日付を飛ばさずに線を結ばなければなりません。人が読み取れてもプログラムでは正しく処理できないのです。  
+
+　  
+
+## 暗黙的な欠落を処理する {.tabset}
+では、暗黙的な欠落をどのように処理すれば良いでしょうか？全ページでみたように欠落部分を補う（本チュートリアルでは、明示的な欠落に変換と表現）必要があります。
+```{r}
+df
+```
+
+　  
+
+### 【質問】
+上表の暗示的な欠落を明示的な欠落に変換する手順を考えて、その手順を説明してください（Rの関数名などを出す必要はありません）。  
+
+　  
+
+### 【手順例】
+1. 2020年1月15日から2020年2月4日までのカレンダーデータを用意する
+1. カレンダーデータと集計データをマージする
+1. マージにより欠損値（`NA`）となっている人数の値をゼロ（$0$）に置き換える
+
+　  
+
+### 【処理例】
+```{r}
+# 1. カレンダーデータを用意する
+cal_data <- data.frame(date = seq.Date(from = lubridate::as_date("2020/1/15"),
+                                       to = lubridate::as_date("2020/2/4"),
+                                       by = "day"))
+# 2. カレンダーデータと集計データ（df）をマージする
+dplyr::left_join(cal_data, df, by = c("date")) %>% 
+# 3. 欠損値（NA）をゼロ（0）に置き換える
+      dplyr::mutate(n = dplyr::if_else(is.na(n), 0L, n))
+```
+
+　  
+
+## tidyrパッケージを使う
+前ページの処理例を一括して実行してくれる`tidyr::complete`という便利な関数が`tidyr`には用意されています。  
+　  
+```{r}
+df %>% 
+  tidyr::complete(date = seq.Date(min(date), max(date), by = "day"),
+                  fill = list(n = 0L))
+```
+　  
+オプション`fill`を指定しない場合は欠損値（`NA`）が入ります。この結果を用いてグラフを描くと陽性確定者が出ていない日を正しく描くことができます。
+```{r}
+df %>% 
+  tidyr::complete(date = seq.Date(min(date), max(date), by = "day"),
+                  fill = list(n = 0L)) %>% 
+  ggplot2::ggplot(ggplot2::aes(x = date, y = n)) + 
+    ggplot2::geom_line()
+```
+
+　  
+
+## 組み合わせデータの場合 {.tabset}
+先程の例では比較的単純な処理でしたが、複数の変量の組み合わせを補完するにはどのようにすれば良いでしょうか？
+
+```{r, echo=FALSE}
+df <- data.frame(group = c(1:2, 1), item_id = c(1:2, 2),
+                 item_name = c("a", "b", "b"),
+                 value1 = 1:3, value2 = 4:6)
+df
+```
+
+　  
+
+### 【質問】
+上表は本来であれば`group`と`item_id`の全ての組み合わせ（4通りの組み合わせ）があるべきデータです。このデータの暗示的な欠落を明示的な欠落に変換する手順を考えて、その手順を説明してください（Rの関数名などを出す必要はありません）。
+
+　  
+
+### 【手順例】
+1. `gropu`と`item_id`が取りうる全ての組み合わせを求める
+1. 上記で求めた組み合わせと上表のデータをマージする
+
+　  
+
+### 【処理例】
+```{r}
+df %>%
+# 1.`gropu`と`item_id`が取りうる全ての組み合わせを求める
+   with(expand.grid(group = unique(group), item_id = unique(item_id))) %>% 
+# 2. 求めた組み合わせと上表のデータをマージする
+   dplyr::left_join(df)
+```
+　  
+
+## tidyr::completeを使う {.tabset}
+`tidyr::complete`関数を用いると以下のようになります。  
+　  
+```{r}
+df %>% 
+  tidyr::complete(group, item_id)
+```
+　  
+上表を良く見ると`item_id`と`item_name`は連動しているようです。このような場合に`tidyr::nesting`関数を用いてパラメータを指定します。
+```{r}
+df %>% 
+  tidyr::complete(group, tidyr::nesting(item_id, item_name))
+```
+
+　  
+
+### 【質問】
+`value1`の欠損値（`NA`）に$0$、`value2`の欠損値（`NA`）に$3$を設定しするために下記のコードを完成させて実行しなさい。
+```{r complete_ex, exercise=TRUE}
+df %>% 
+  tidyr::complete(group, tidyr::nesting(item_id, item_name),
+                  fill = list())
+```
+
+```{r complete_ex-hint}
+df %>% 
+  tidyr::complete(group, tidyr::nesting(item_id, item_name),
+                  fill = list(value1 = 0L, value2 = 3L))
+```
+
+　  
+
+## その他の便利関数
+
+　  
+
+### `NA`を任意の値に置換する
+単に`NA`の値を任意の値に変換する場合には`tidyr::replace_na`関数が便利です。ヘルプにあるコードを実行すると非常に単純な指定で変換できることが分かります。  
+　  
+```{r}
+data.frame(x = c(1, 2, NA), y = c("a", NA, "b")) %>% 
+   print() %>% 
+   replace_na(list(x = 0, y = "unknown"))
+```
+
+　  
+
+### `NA`を含む行を削除する
+`NA`を含む行を削除したい場合があります。このような場合には`tdiyr::drop_na`関数が便利です。パラメータの指定方法で結果が変わりますので注意してください。  
+　  
+```{r}
+airquality
+```
+
+　  
+欠損値（`NA`）が含まれる場合、無条件に行（インスタンス）を削除します。  
+　  
+```{r}
+airquality %>% 
+   tidyr::drop_na()
+```
+
+　  
+`Ozone`に欠損値（`NA`）が含まれる場合のみ行（インスタンス）を削除します。  
+　  
+```{r}
+airquality %>% 
+   tidyr::drop_na(Ozone)
+```
+
+　  
+
+### データを補完する
+下表のような規則的に欠損しているデータを補完するには`tidyr::fill`関数を用います。
+```{r, echo=FALSE}
+sales <- tibble::tribble(
+  ~quarter, ~year, ~sales,
+  "Q1",    2000,    66013,
+  "Q2",      NA,    69182,
+  "Q3",      NA,    53175,
+  "Q4",      NA,    21001,
+  "Q1",    2001,    46036,
+  "Q2",      NA,    58842,
+  "Q3",      NA,    44568,
+  "Q4",      NA,    50197,
+  "Q1",    2002,    39113,
+  "Q2",      NA,    41668,
+  "Q3",      NA,    30144,
+  "Q4",      NA,    52897,
+  "Q1",    2004,    32129,
+  "Q2",      NA,    67686,
+  "Q3",      NA,    31768,
+  "Q4",      NA,    49094
+)
+```
+```{r}
+sales
+```
+
+　  
+`.direction`オプションの指定により補完方向が変わります。具体的な動作はヘルプファイルを参照してください。
+```{r}
+sales %>% 
+   tidyr::fill(year, .direction = "down")
+```
+
+　  
+
+### 組み合わせデータを生成する
+先程は考えうる組み合わせデータを作成するために`expand.grid`関数を用いましたが、以下のようなデータから`year`, `type`, `size`の組み合わせを生成するにはどのようにしたら良いでしょうか？  
+　  
+```{r}
+fruits <- tibble(
+   type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
+   year   = c(2010, 2010, 2012, 2010, 2010, 2012),
+   size  =  factor(c("XS", "S",  "M", "S", "S", "M"),
+                   levels = c("XS", "S", "M", "L")),
+   weights = rnorm(6, as.numeric(size) + 2))
+fruits
+```
+
+　  
+`tidyr::expand`関数を使えば、簡単に求めることができます。  
+　  
+```{r}
+fruits %>% 
+   tidyr::expand(year, type, size)
+```
+
+　  
+`size`に'L'があるのは`size`が因子型変数で4種類の水準をもっているからです。  
+　  
+```{r}
+levels(fruits$size)
+```
+
+　  
+`expand.grid`で同様の処理を行うとインスタンスにない'L'サイズが出てこないという弊害が生じます。  
+　  
+```{r}
+fruits %>% 
+   with(expand.grid(year = unique(year), type = unique(type),
+                    size = unique(size))) %>% 
+   dplyr::arrange(year, type)
+```
+
+
+
+
+## Appendix
+更に詳しくRを学ぶには以下の図書やコミュニティを活用してください。
+
+統計の基礎とRで処理方法を学びたい場合は[改定版 統計学基礎][B1]や[Rで楽しむ統計][B2]。
+Rの基礎から学びたい場合は[みんなのR][B3]や[パーフェクトR][B4]。  
+
+ネットコミュニティで質問したい場合は、日本のR界の著名人が集まっている[R-wakalang][C1]や
+[Rjp Wiki][C2]で、検索にはRに特化した検索エンジンである[seek R][C3]がすゝめです。
+
+　  
+
+なお、本チュートリアルで使用しているコードの一部は各関数のヘルプのサンプルコードを引用しています。
+
+---
+
+![Sampo Suzuki][CCI]
+[CC BY-NC-SA 4.0][CC], Sampo Suzuki [`r format(Sys.time(), format = '%F (%Z)')`]
+
+[0]: https://sites.google.com/site/kantometrics/ "データ分析勉強会"
+[CC]: http://creativecommons.org/licenses/by-nc-sa/4.0/deed.ja "CC BY-NC-SA 4.0"
+[CCI]: https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "CC BY-NC-SA 4.0 icon"
+[RS]: https://www.rstudio.com/ "RStudio"
+
+<!-- Books -->
+[B1]: http://www.tokyo-tosho.co.jp/books/978-4-489-02227-2/ "統計学基礎"
+[B2]: http://www.kyoritsu-pub.co.jp/bookdetail/9784320112414 "Rで楽しむ統計"
+[B3]: https://book.mynavi.jp/ec/products/detail/id=39763 "みんなのR"
+[B4]: http://gihyo.jp/book/2017/978-4-7741-8812-6 "パーフェクトR"
+
+<!-- Net Community -->
+[C1]: http://qiita.com/uri/items/5583e91bb5301ed5a4ba "R-wakalang"
+[C2]: http://www.okadajp.org/RWiki/ "RjpWiki"
+[C3]: http://seekr.jp/ "seek R"
