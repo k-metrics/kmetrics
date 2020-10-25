@@ -1,7 +1,7 @@
 Package: kmetrics
 Type: Package
 Title: in-IDE japanese tutorial for beginners
-Version: 0.1.2
+Version: 0.1.3
 Author: Sampo Suzuki
 Maintainer: The package maintainer <k-metrics@github.com>
 Description: in-IDE tutorials in japanese.
